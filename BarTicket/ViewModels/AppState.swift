@@ -53,6 +53,7 @@ final class AppState {
     /// Transition the Dynamic Island through the full flow
     @MainActor
     func showIsland(state: IslandState) {
+        print("[BarTicket] showIsland called, controller exists: \(islandController != nil)")
         islandState = state
         islandController?.show(state: state)
     }

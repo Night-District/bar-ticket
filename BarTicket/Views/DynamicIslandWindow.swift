@@ -54,6 +54,7 @@ final class DynamicIslandController {
     func show(state: IslandState) {
         dismissTask?.cancel()
 
+        print("[BarTicket] Island show: \(state), window exists: \(window != nil), window frame: \(window?.frame ?? .zero)")
         islandViewModel.update(state: state)
         window?.orderFrontRegardless()
         window?.alphaValue = 1.0

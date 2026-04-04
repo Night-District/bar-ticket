@@ -24,14 +24,7 @@ struct DynamicIslandView: View {
                 Color.clear
                     .frame(width: 0, height: 0)
 
-                //TODO: Add a subtle "bar ticket" icon in the corner when idle?
-                
-                // TODO: Maybe show a "no TODOs detected" message after some idle time?
-                
-                //TODO: sfdsdfdsdsfsdffd hey
-                
-                
-                
+            //TODO: For better UX, we could show a "No TODOs detected" message that fades out after a few seconds, instead of showing nothing.
             case .detecting(let title):
                 islandPill {
                     HStack(spacing: 8) {
@@ -74,12 +67,15 @@ struct DynamicIslandView: View {
                             .font(.system(size: 14))
                             .foregroundStyle(.green)
                             .symbolEffect(.bounce, value: issueNumber)
+                        
                         Text("Pushed")
                             .font(.system(.caption, design: .rounded, weight: .semibold))
                             .foregroundStyle(.white)
+                        
                         Text("#\(issueNumber)")
                             .font(.system(.caption, design: .monospaced, weight: .bold))
                             .foregroundStyle(.green)
+                        
                         Text("to \(repoFullName)")
                             .font(.system(.caption2, design: .rounded))
                             .foregroundStyle(.white.opacity(0.7))
@@ -109,7 +105,8 @@ struct DynamicIslandView: View {
         .animation(.spring(response: 0.4, dampingFraction: 0.78), value: viewModel.state)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-
+    
+    //TODO: Remove border around Capsule and add a subtle inner shadow for better contrast against light backgrounds. This will make the island more visible without being too heavy-handed.
     private func islandPill<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         content()
             .padding(.horizontal, 16)

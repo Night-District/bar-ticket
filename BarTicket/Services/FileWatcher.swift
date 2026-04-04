@@ -124,15 +124,23 @@ final class FileWatcher {
 
     /// Process a file change event
     fileprivate func handleFileEvent(path: String) {
+        print("[BarTicket] File event: \(path)")
         let url = URL(fileURLWithPath: path)
 
         // Skip non-code files
         let ext = url.pathExtension.lowercased()
-        guard Constants.watchedExtensions.contains(ext) else { return }
+        guard Constants.watchedExtensions.contains(ext) else {
+            return
+        }
+
+        print("[BarTicket] Code file changed: \(path)")
 
         // Skip ignored directories
         let pathComponents = Set(url.pathComponents)
-        guard Constants.ignoredDirectories.isDisjoint(with: pathComponents) else { return }
+        guard Constants.ignoredDirectories.isDisjoint(with: pathComponents) else {
+            print("[BarTicket] Skipping ignored directory: \(path)")
+            return
+        }
 
         // Read current content
         guard let currentContent = try? String(contentsOfFile: path, encoding: .utf8) else {
@@ -142,6 +150,10 @@ final class FileWatcher {
 
         let previousContent = fileCache[path]
         let hadPrevious = previousContent != nil
+
+        // Parse current TODOs for debugging
+        let allCurrentTodos = TodoParser.parseTodos(from: currentContent, filePath: path)
+        print("[BarTicket] File has \(allCurrentTodos.count) TODO(s), cached: \(hadPrevious), seenHashes: \(seenHashes.count)")
 
         // Find new TODOs
         let newTodos = TodoParser.findNewTodos(
@@ -154,16 +166,19 @@ final class FileWatcher {
         // Update cache
         fileCache[path] = currentContent
 
-        if !newTodos.isEmpty {
-            print("[BarTicket] Found \(newTodos.count) new TODO(s) in \(path) (had previous cache: \(hadPrevious))")
+        if newTodos.isEmpty {
+            print("[BarTicket] No new TODOs (all \(allCurrentTodos.count) already seen or in previous cache)")
+        } else {
+            print("[BarTicket] Found \(newTodos.count) new TODO(s) in \(path)")
+            for todo in newTodos {
+                print("[BarTicket]   -> \"\(todo.title)\" (hash: \(todo.contentHash.prefix(12))...)")
+            }
         }
 
         // Notify for each new TODO
         for todo in newTodos {
             seenHashes.insert(todo.contentHash)
-            DispatchQueue.main.async { [weak self] in
-                self?.onTodoDetected?(todo)
-            }
+            onTodoDetected?(todo)
         }
     }
 }
@@ -178,21 +193,28 @@ private func fsEventsCallback(
     _ eventFlags: UnsafePointer<FSEventStreamEventFlags>,
     _ eventIds: UnsafePointer<FSEventStreamEventId>
 ) {
-    guard let info = clientCallBackInfo else { return }
+    guard let info = clientCallBackInfo else {
+        print("[BarTicket] FSEvents callback: no client info")
+        return
+    }
     let watcher = Unmanaged<FileWatcher>.fromOpaque(info).takeUnretainedValue()
 
-    guard let paths = unsafeBitCast(eventPaths, to: NSArray.self) as? [String] else { return }
+    guard let paths = unsafeBitCast(eventPaths, to: NSArray.self) as? [String] else {
+        print("[BarTicket] FSEvents callback: could not cast event paths")
+        return
+    }
 
     for i in 0..<numEvents {
         let flags = eventFlags[i]
         let path = paths[i]
 
-        // Only process file modifications (not directory events, renames, etc.)
         let isFile = flags & UInt32(kFSEventStreamEventFlagItemIsFile) != 0
         let isModified = flags & UInt32(kFSEventStreamEventFlagItemModified) != 0
         let isCreated = flags & UInt32(kFSEventStreamEventFlagItemCreated) != 0
+        let isRenamed = flags & UInt32(kFSEventStreamEventFlagItemRenamed) != 0
 
-        if isFile && (isModified || isCreated) {
+        // Include Renamed because Xcode uses atomic saves (write temp → rename to target)
+        if isFile && (isModified || isCreated || isRenamed) {
             watcher.handleFileEvent(path: path)
         }
     }

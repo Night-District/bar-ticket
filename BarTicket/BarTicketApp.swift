@@ -3,9 +3,26 @@ import SwiftData
 
 @main
 struct BarTicketApp: App {
-    @State private var appState = AppState()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
-    private let modelContainer: ModelContainer = {
+    var body: some Scene {
+        MenuBarExtra("Bar Ticket", systemImage: "ticket.fill") {
+            SettingsView()
+                .environment(appDelegate.appState)
+                .modelContainer(appDelegate.modelContainer)
+                .frame(width: 380, height: 440)
+        }
+        .menuBarExtraStyle(.window)
+    }
+}
+
+// MARK: - App Delegate
+
+@MainActor
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    let appState = AppState()
+
+    let modelContainer: ModelContainer = {
         let schema = Schema([
             AppSettings.self,
             WatchedDirectory.self,
@@ -19,28 +36,17 @@ struct BarTicketApp: App {
         }
     }()
 
-    init() {
+    func applicationDidFinishLaunching(_ notification: Notification) {
         bootstrap()
     }
 
-    var body: some Scene {
-        MenuBarExtra("Bar Ticket", systemImage: "ticket.fill") {
-            SettingsView()
-                .environment(appState)
-                .modelContainer(modelContainer)
-                .frame(width: 380, height: 440)
-        }
-        .menuBarExtraStyle(.window)
-    }
-
-    // MARK: - Bootstrap
-
     private func bootstrap() {
+        let context = modelContainer.mainContext
+
         // Load token
         appState.loadToken()
 
         // Seed AppSettings if needed
-        let context = modelContainer.mainContext
         let settingsDescriptor = FetchDescriptor<AppSettings>()
         if (try? context.fetchCount(settingsDescriptor)) == 0 {
             context.insert(AppSettings())
@@ -82,9 +88,11 @@ struct BarTicketApp: App {
         }
 
         // Handle new TODOs
-        watcher.onTodoDetected = { [appState, context] todo in
+        watcher.onTodoDetected = { [weak self] todo in
             print("[BarTicket] TODO detected: \"\(todo.title)\" in \(todo.filePath):\(todo.lineNumber)")
-            handleNewTodo(todo, appState: appState, context: context)
+            DispatchQueue.main.async {
+                self?.handleNewTodo(todo, context: context)
+            }
         }
 
         // Start watching enabled directories
@@ -114,7 +122,7 @@ struct BarTicketApp: App {
     // MARK: - TODO Handling Pipeline
 
     @MainActor
-    private func handleNewTodo(_ todo: ParsedTodo, appState: AppState, context: ModelContext) {
+    private func handleNewTodo(_ todo: ParsedTodo, context: ModelContext) {
         guard appState.isWatchingEnabled else { return }
         guard let token = appState.githubToken else {
             appState.showIsland(state: .error(message: "No GitHub token configured"))
@@ -176,8 +184,11 @@ struct BarTicketApp: App {
                     issueNumber: response.number,
                     issueURL: response.htmlUrl
                 ))
+
+                print("[BarTicket] Issue created: #\(response.number) on \(repoInfo.fullName)")
             } catch {
                 appState.showIsland(state: .error(message: error.localizedDescription))
+                print("[BarTicket] Error creating issue: \(error)")
             }
         }
     }
