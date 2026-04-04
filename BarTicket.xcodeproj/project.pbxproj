@@ -1,0 +1,422 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		059DA0807579DB4A87095C9B /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F451F7E719B10F1621256F0A /* AppSettings.swift */; };
+		28E9A422848D3D302A0D03E7 /* FileWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E008ACE6FA2659DE4A51EBE /* FileWatcher.swift */; };
+		3F68F380495D45FA16C297DC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8AC6143CA7BF64B2BAF007 /* SettingsView.swift */; };
+		540CF3013DBBBBF326F1C9AC /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E90F4B01A5C198FE0307701 /* AppState.swift */; };
+		5C52FC8A2F68AE2B24A99488 /* BarTicketApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F507DC7CA0D9F143237B4B34 /* BarTicketApp.swift */; };
+		5D81B13A6426FC6601AC2C44 /* WatchedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D521C60A90EFB5E998568CC8 /* WatchedDirectory.swift */; };
+		5E4540AC983CF012FDBFF754 /* TodoParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4950D3ED46181FBBB88678 /* TodoParser.swift */; };
+		804A431941E07C7DCAB3072D /* SeenTodo.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED211344F252E3986FB5AF04 /* SeenTodo.swift */; };
+		8EF7386AA86B07DC22B7DD70 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9737CE62F300FA96DAFD1C4F /* Alamofire */; };
+		AC984B7FB127F06CB0CF15F5 /* DynamicIslandView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750E637DD55594CCF5C75E78 /* DynamicIslandView.swift */; };
+		D28CDF2D71D68A356EEAF58C /* GitHubClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E23A849A4DDD594F868BA63 /* GitHubClient.swift */; };
+		DE79B8E7FD665531D97AD38C /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403057D30BB6BE30CEF8E201 /* KeychainService.swift */; };
+		E2853D30DEBE8070CE60962D /* GitResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C9A318AC41F205C94733E /* GitResolver.swift */; };
+		F12E6D92B7591973EF6384F1 /* DynamicIslandWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F86C415F6801E38E222016DA /* DynamicIslandWindow.swift */; };
+		F610043466E0E1C7807AFD68 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DECD5A1F7EF0D6CCF93CEB93 /* Constants.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2B4950D3ED46181FBBB88678 /* TodoParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoParser.swift; sourceTree = "<group>"; };
+		35B40BFAA21B9D32DB623031 /* BarTicket.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BarTicket.entitlements; sourceTree = "<group>"; };
+		403057D30BB6BE30CEF8E201 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		4E90F4B01A5C198FE0307701 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		672C9A318AC41F205C94733E /* GitResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitResolver.swift; sourceTree = "<group>"; };
+		6E23A849A4DDD594F868BA63 /* GitHubClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubClient.swift; sourceTree = "<group>"; };
+		750E637DD55594CCF5C75E78 /* DynamicIslandView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandView.swift; sourceTree = "<group>"; };
+		7F577904FD1BA62C74B9F423 /* BarTicket.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BarTicket.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E008ACE6FA2659DE4A51EBE /* FileWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWatcher.swift; sourceTree = "<group>"; };
+		CF8AC6143CA7BF64B2BAF007 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		D521C60A90EFB5E998568CC8 /* WatchedDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchedDirectory.swift; sourceTree = "<group>"; };
+		DECD5A1F7EF0D6CCF93CEB93 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		ED211344F252E3986FB5AF04 /* SeenTodo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeenTodo.swift; sourceTree = "<group>"; };
+		F429A7C9C85509193C294206 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		F451F7E719B10F1621256F0A /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		F507DC7CA0D9F143237B4B34 /* BarTicketApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTicketApp.swift; sourceTree = "<group>"; };
+		F86C415F6801E38E222016DA /* DynamicIslandWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandWindow.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FA3148BFA8F5582B1D02C5C9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8EF7386AA86B07DC22B7DD70 /* Alamofire in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1DC8896ABBFC5D35DEB1FC91 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				8E008ACE6FA2659DE4A51EBE /* FileWatcher.swift */,
+				6E23A849A4DDD594F868BA63 /* GitHubClient.swift */,
+				672C9A318AC41F205C94733E /* GitResolver.swift */,
+				403057D30BB6BE30CEF8E201 /* KeychainService.swift */,
+				2B4950D3ED46181FBBB88678 /* TodoParser.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		510EF9B748A97B2AD3CC0C4F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7F577904FD1BA62C74B9F423 /* BarTicket.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		54A0133A339749BB0A322606 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F451F7E719B10F1621256F0A /* AppSettings.swift */,
+				ED211344F252E3986FB5AF04 /* SeenTodo.swift */,
+				D521C60A90EFB5E998568CC8 /* WatchedDirectory.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		780984CE20BCB862A4C328C0 /* BarTicket */ = {
+			isa = PBXGroup;
+			children = (
+				35B40BFAA21B9D32DB623031 /* BarTicket.entitlements */,
+				F507DC7CA0D9F143237B4B34 /* BarTicketApp.swift */,
+				F429A7C9C85509193C294206 /* Info.plist */,
+				54A0133A339749BB0A322606 /* Models */,
+				1DC8896ABBFC5D35DEB1FC91 /* Services */,
+				C3229045AF72AF50366D6DED /* Utilities */,
+				DFB553B96BB7D36CFD9802BD /* ViewModels */,
+				D180593C1C073C2BA59F3ED4 /* Views */,
+			);
+			path = BarTicket;
+			sourceTree = "<group>";
+		};
+		C3229045AF72AF50366D6DED /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				DECD5A1F7EF0D6CCF93CEB93 /* Constants.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		D180593C1C073C2BA59F3ED4 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				750E637DD55594CCF5C75E78 /* DynamicIslandView.swift */,
+				F86C415F6801E38E222016DA /* DynamicIslandWindow.swift */,
+				CF8AC6143CA7BF64B2BAF007 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D9CA812CE99AC25A1DBD90F1 = {
+			isa = PBXGroup;
+			children = (
+				780984CE20BCB862A4C328C0 /* BarTicket */,
+				510EF9B748A97B2AD3CC0C4F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DFB553B96BB7D36CFD9802BD /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				4E90F4B01A5C198FE0307701 /* AppState.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A1E46FF95B2E52E7D5C11B0C /* BarTicket */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A4D47DF8404E7B7AD283C5C /* Build configuration list for PBXNativeTarget "BarTicket" */;
+			buildPhases = (
+				29DA5E7B62A16D60F8117C3B /* Sources */,
+				FA3148BFA8F5582B1D02C5C9 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BarTicket;
+			packageProductDependencies = (
+				9737CE62F300FA96DAFD1C4F /* Alamofire */,
+			);
+			productName = BarTicket;
+			productReference = 7F577904FD1BA62C74B9F423 /* BarTicket.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		37039159B57360D957AA5BC9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 801D09E56011760D88BF4018 /* Build configuration list for PBXProject "BarTicket" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = D9CA812CE99AC25A1DBD90F1;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				EB7083ED5EB5463C30A7DAA7 /* XCRemoteSwiftPackageReference "Alamofire" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 510EF9B748A97B2AD3CC0C4F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1E46FF95B2E52E7D5C11B0C /* BarTicket */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		29DA5E7B62A16D60F8117C3B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				059DA0807579DB4A87095C9B /* AppSettings.swift in Sources */,
+				540CF3013DBBBBF326F1C9AC /* AppState.swift in Sources */,
+				5C52FC8A2F68AE2B24A99488 /* BarTicketApp.swift in Sources */,
+				F610043466E0E1C7807AFD68 /* Constants.swift in Sources */,
+				AC984B7FB127F06CB0CF15F5 /* DynamicIslandView.swift in Sources */,
+				F12E6D92B7591973EF6384F1 /* DynamicIslandWindow.swift in Sources */,
+				28E9A422848D3D302A0D03E7 /* FileWatcher.swift in Sources */,
+				D28CDF2D71D68A356EEAF58C /* GitHubClient.swift in Sources */,
+				E2853D30DEBE8070CE60962D /* GitResolver.swift in Sources */,
+				DE79B8E7FD665531D97AD38C /* KeychainService.swift in Sources */,
+				804A431941E07C7DCAB3072D /* SeenTodo.swift in Sources */,
+				3F68F380495D45FA16C297DC /* SettingsView.swift in Sources */,
+				5E4540AC983CF012FDBFF754 /* TodoParser.swift in Sources */,
+				5D81B13A6426FC6601AC2C44 /* WatchedDirectory.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		32110056F3D1961CFBAE52BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BarTicket/BarTicket.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BarTicket/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 2.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nightdistrict.bar-ticket";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.10;
+			};
+			name = Debug;
+		};
+		375D99C181F0FA39036EF04A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		3A2BF4AC48543DDB5833DC57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		870149548319EBAD51DDA137 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BarTicket/BarTicket.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BarTicket/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 2.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.nightdistrict.bar-ticket";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.10;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7A4D47DF8404E7B7AD283C5C /* Build configuration list for PBXNativeTarget "BarTicket" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				32110056F3D1961CFBAE52BB /* Debug */,
+				870149548319EBAD51DDA137 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		801D09E56011760D88BF4018 /* Build configuration list for PBXProject "BarTicket" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				375D99C181F0FA39036EF04A /* Debug */,
+				3A2BF4AC48543DDB5833DC57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		EB7083ED5EB5463C30A7DAA7 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.9.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9737CE62F300FA96DAFD1C4F /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EB7083ED5EB5463C30A7DAA7 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 37039159B57360D957AA5BC9 /* Project object */;
+}

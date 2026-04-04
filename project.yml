@@ -1,0 +1,35 @@
+name: BarTicket
+options:
+  bundleIdPrefix: com.nightdistrict
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "16.0"
+  minimumXcodeGenVersion: "2.38.0"
+
+packages:
+  Alamofire:
+    url: https://github.com/Alamofire/Alamofire.git
+    from: "5.9.0"
+
+targets:
+  BarTicket:
+    type: application
+    platform: macOS
+    sources:
+      - BarTicket
+    settings:
+      base:
+        INFOPLIST_FILE: BarTicket/Info.plist
+        CODE_SIGN_ENTITLEMENTS: BarTicket/BarTicket.entitlements
+        PRODUCT_BUNDLE_IDENTIFIER: com.nightdistrict.bar-ticket
+        MARKETING_VERSION: "2.0.0"
+        CURRENT_PROJECT_VERSION: 1
+        SWIFT_VERSION: "5.10"
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        GENERATE_INFOPLIST_FILE: false
+    dependencies:
+      - package: Alamofire
+    info:
+      path: BarTicket/Info.plist
+    entitlements:
+      path: BarTicket/BarTicket.entitlements
