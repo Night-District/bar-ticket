@@ -20,6 +20,8 @@ targets:
     platform: macOS
     sources:
       - BarTicket
+    assetCatalogs:
+      - Icons
     settings:
       base:
         INFOPLIST_FILE: BarTicket/Info.plist
