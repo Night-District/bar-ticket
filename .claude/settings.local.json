@@ -23,7 +23,11 @@
       "Bash(gh api:*)",
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
-      "Bash(gh run:*)"
+      "Bash(gh run:*)",
+      "Read(//Users/loganriedley/Desktop/BarTicket.app/**)",
+      "Read(//Users/loganriedley/Desktop/**)",
+      "Bash(hdiutil create:*)",
+      "Bash(chmod +x /Users/loganriedley/Developer/night-district/bar-ticket/.claude/skills/deploy/deploy.sh)"
     ]
   }
 }

@@ -30,6 +30,7 @@ targets:
         SWIFT_VERSION: "5.10"
         MACOSX_DEPLOYMENT_TARGET: "14.0"
         GENERATE_INFOPLIST_FILE: false
+        ENABLE_HARDENED_RUNTIME: true
     dependencies:
       - package: Alamofire
       - package: DynamicNotchKit

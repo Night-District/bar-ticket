@@ -33,7 +33,7 @@ final class DynamicIslandController {
         case .hidden:
             dismiss()
             return
-            
+        
         case .detecting(let title):
             viewModel.icon = "gear"
             viewModel.iconColor = .blue
