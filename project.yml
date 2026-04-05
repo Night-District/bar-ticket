@@ -10,6 +10,9 @@ packages:
   Alamofire:
     url: https://github.com/Alamofire/Alamofire.git
     from: "5.9.0"
+  DynamicNotchKit:
+    url: https://github.com/MrKai77/DynamicNotchKit.git
+    from: "1.0.0"
 
 targets:
   BarTicket:
@@ -29,6 +32,7 @@ targets:
         GENERATE_INFOPLIST_FILE: false
     dependencies:
       - package: Alamofire
+      - package: DynamicNotchKit
     info:
       path: BarTicket/Info.plist
     entitlements:

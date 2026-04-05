@@ -19,13 +19,17 @@ struct SettingsView: View {
             HStack {
                 Image(systemName: "ticket.fill")
                     .foregroundStyle(.blue)
+                
                 Text("Bar Ticket")
                     .font(.headline)
+                
                 Spacer()
+                
                 Toggle("", isOn: watchingToggle)
                     .toggleStyle(.switch)
                     .controlSize(.small)
                     .labelsHidden()
+                
                 Text(appState.isWatchingEnabled ? "Active" : "Paused")
                     .font(.caption)
                     .foregroundStyle(appState.isWatchingEnabled ? .green : .secondary)
@@ -34,6 +38,8 @@ struct SettingsView: View {
 
             Divider()
 
+            //TODO: change/refactor-view (#33 https://github.com/Night-District/bar-ticket/issues/33)
+            // Refactor this view to use a List with sections instead of multiple GroupBoxes inside a ScrollView. This will give us built-in support for headers, footers, and better performance with large data sets. The current implementation is fine for a small number of settings, but it may become unwieldy as we add more features in the future.
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     // GitHub Token
@@ -73,7 +79,7 @@ struct SettingsView: View {
                         }
                         .padding(.vertical, 2)
                     }
-
+                    
                     // Watched Directories
                     GroupBox {
                         VStack(alignment: .leading, spacing: 8) {

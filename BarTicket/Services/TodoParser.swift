@@ -58,13 +58,26 @@ enum TodoParser {
             let line = lines[i]
             let trimmed = line.trimmingCharacters(in: .whitespaces)
 
-            // Check if this line contains TODO:
-            if let todoRange = trimmed.range(of: "TODO:", options: .caseInsensitive) {
-                let todoText = String(trimmed[todoRange.upperBound...])
-                    .trimmingCharacters(in: .whitespaces)
+            let commentPrefix = detectCommentPrefix(trimmed)
+            let isInsideBlockComment = trimmed.hasPrefix("*") || trimmed.hasPrefix("/*")
 
-                // Determine the comment prefix used
-                let commentPrefix = detectCommentPrefix(trimmed)
+            // Strip comment prefix to get the comment body
+            let commentBody: String? = {
+                if let prefix = commentPrefix {
+                    return String(trimmed.dropFirst(prefix.count)).trimmingCharacters(in: .whitespaces)
+                } else if isInsideBlockComment {
+                    var body = trimmed
+                    if body.hasPrefix("/*") { body = String(body.dropFirst(2)) }
+                    else if body.hasPrefix("*") { body = String(body.dropFirst(1)) }
+                    return body.trimmingCharacters(in: .whitespaces)
+                }
+                return nil
+            }()
+
+            // Match "TODO:" only at the start of the comment body (not embedded in code snippets)
+            if let body = commentBody,
+               body.range(of: "^TODO:", options: [.caseInsensitive, .regularExpression]) != nil {
+                let todoText = String(body.dropFirst(5)).trimmingCharacters(in: .whitespaces)
 
                 // Collect the full comment block
                 var blockLines: [String] = [todoText]

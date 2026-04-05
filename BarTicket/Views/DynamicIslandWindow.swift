@@ -1,65 +1,85 @@
 import AppKit
 import SwiftUI
+import DynamicNotchKit
 
-/// Controller that manages the floating Dynamic Island window
+enum IconAnimation: Equatable {
+    case none
+    case rotating
+    case pulsing
+}
+
+@MainActor
+@Observable
+final class NotchViewModel {
+    var icon: String = "circle.fill"
+    var iconColor: Color = .blue
+    var iconAnimation: IconAnimation = .none
+    var title: String = ""
+    var subtitle: String = ""
+    var issueURL: String?
+}
+
 @MainActor
 final class DynamicIslandController {
-
-    private var window: NSWindow?
-    private var hostingView: NSHostingView<DynamicIslandView>?
-    private var islandViewModel = DynamicIslandViewModel()
+    private var notch: DynamicNotch<NotchExpandedView, EmptyView, EmptyView>?
+    private let viewModel = NotchViewModel()
     private var dismissTask: Task<Void, Never>?
-
-    init() {
-        setupWindow()
-    }
-
-    private func setupWindow() {
-        let view = DynamicIslandView(viewModel: islandViewModel)
-        let hosting = NSHostingView(rootView: view)
-        hosting.frame = NSRect(x: 0, y: 0, width: 340, height: 48)
-
-        let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 340, height: 48),
-            styleMask: .borderless,
-            backing: .buffered,
-            defer: false
-        )
-
-        window.contentView = hosting
-        window.backgroundColor = .clear
-        window.isOpaque = false
-        window.hasShadow = true
-        window.level = .floating
-        window.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
-        window.ignoresMouseEvents = false
-        window.isMovableByWindowBackground = false
-        window.titlebarAppearsTransparent = true
-        window.titleVisibility = .hidden
-
-        // Position at top-center of main screen, near the notch
-        if let screen = NSScreen.main {
-            let screenFrame = screen.frame
-            let visibleFrame = screen.visibleFrame
-            let notchHeight = screenFrame.height - visibleFrame.height - (visibleFrame.origin.y - screenFrame.origin.y)
-            let windowX = screenFrame.midX - 170
-            let windowY = screenFrame.maxY - notchHeight - 56
-            window.setFrameOrigin(NSPoint(x: windowX, y: windowY))
-        }
-
-        self.window = window
-        self.hostingView = hosting
-    }
+    private var isVisible = false
 
     func show(state: IslandState) {
         dismissTask?.cancel()
+        
+        switch state {
+        case .hidden:
+            dismiss()
+            return
+            
+        case .detecting(let title):
+            viewModel.icon = "gear"
+            viewModel.iconColor = .blue
+            viewModel.iconAnimation = .rotating
+            viewModel.title = "TODO detected"
+            viewModel.subtitle = title
+            viewModel.issueURL = nil
 
-        print("[BarTicket] Island show: \(state), window exists: \(window != nil), window frame: \(window?.frame ?? .zero)")
-        islandViewModel.update(state: state)
-        window?.orderFrontRegardless()
-        window?.alphaValue = 1.0
+        case .creating(let title):
+            viewModel.icon = "arrow.trianglehead.2.counterclockwise"
+            viewModel.iconColor = .orange
+            viewModel.iconAnimation = .rotating
+            viewModel.title = "Creating issue..."
+            viewModel.subtitle = title
+            viewModel.issueURL = nil
 
-        // Auto-dismiss based on state
+        case .confirmed(_, let repoFullName, let issueNumber, let issueURL):
+            viewModel.icon = "checkmark.circle.fill"
+            viewModel.iconColor = .green
+            viewModel.iconAnimation = .pulsing
+            viewModel.title = "Pushed #\(issueNumber)"
+            viewModel.subtitle = repoFullName
+            viewModel.issueURL = issueURL
+
+        case .error(let message):
+            viewModel.icon = "xmark.circle.fill"
+            viewModel.iconColor = .red
+            viewModel.iconAnimation = .none
+            viewModel.title = "Failed"
+            viewModel.subtitle = message
+            viewModel.issueURL = nil
+        }
+
+        if !isVisible {
+            isVisible = true
+            let newNotch = DynamicNotch(hoverBehavior: [.hapticFeedback], style: .notch) {
+                NotchExpandedView(viewModel: self.viewModel)
+            }
+            notch = newNotch
+            Task { @MainActor in
+                if let screen = NSScreen.main {
+                    await newNotch.expand(on: screen)
+                }
+            }
+        }
+
         switch state {
         case .confirmed:
             scheduleDismiss(after: Constants.islandConfirmDuration)
@@ -72,27 +92,109 @@ final class DynamicIslandController {
 
     func dismiss() {
         dismissTask?.cancel()
-
-        // Fade out animation
-        NSAnimationContext.runAnimationGroup({ context in
-            context.duration = 0.3
-            window?.animator().alphaValue = 0
-        }, completionHandler: { [weak self] in
-            self?.window?.orderOut(nil)
-            self?.islandViewModel.update(state: .hidden)
-        })
+        isVisible = false
+        Task { @MainActor in
+            await notch?.hide()
+            notch = nil
+        }
     }
 
     private func scheduleDismiss(after delay: TimeInterval) {
         dismissTask = Task { @MainActor in
             try? await Task.sleep(for: .seconds(delay))
             guard !Task.isCancelled else { return }
-            dismiss()
+            isVisible = false
+            await notch?.hide()
+            notch = nil
         }
     }
+}
 
-    /// Make the confirmed state clickable to open the issue URL
-    func setClickHandler(_ handler: @escaping (String) -> Void) {
-        islandViewModel.onClickURL = handler
+struct NotchExpandedView: View {
+    @Bindable var viewModel: NotchViewModel
+
+    var body: some View {
+        HStack(spacing: 10) {
+            AnimatedIcon(
+                systemName: viewModel.icon,
+                color: viewModel.iconColor,
+                animation: viewModel.iconAnimation
+            )
+            .frame(width: 30, height: 30)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(viewModel.title)
+                    .font(.headline)
+                    .foregroundStyle(.white)
+
+                if !viewModel.subtitle.isEmpty {
+                    Text(viewModel.subtitle)
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+            }
+
+            Spacer(minLength: 0)
+
+            if let urlString = viewModel.issueURL,
+               let url = URL(string: urlString) {
+                Button {
+                    NSWorkspace.shared.open(url)
+                } label: {
+                    Text("Open")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(.white.opacity(0.15), in: Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .frame(height: 40)
+    }
+}
+
+struct AnimatedIcon: View {
+    let systemName: String
+    let color: Color
+    let animation: IconAnimation
+
+    var body: some View {
+        AnimatedIconInner(systemName: systemName, color: color, animation: animation)
+            .id(animation)
+    }
+}
+
+private struct AnimatedIconInner: View {
+    let systemName: String
+    let color: Color
+    let animation: IconAnimation
+
+    @State private var rotation: Double = 0
+    @State private var scale: CGFloat = 1
+
+    var body: some View {
+        Image(systemName: systemName)
+            .resizable()
+            .scaledToFit()
+            .foregroundStyle(color)
+            .rotationEffect(.degrees(rotation))
+            .scaleEffect(scale)
+            .onAppear {
+                switch animation {
+                case .rotating:
+                    withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
+                        rotation = 360
+                    }
+                case .pulsing:
+                    withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
+                        scale = 1.15
+                    }
+                case .none:
+                    break
+                }
+            }
     }
 }

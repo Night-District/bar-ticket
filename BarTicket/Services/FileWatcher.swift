@@ -58,6 +58,13 @@ final class FileWatcher {
         seenHashes.insert(hash)
     }
 
+    /// Update the cached content for a file to prevent re-triggering on our own edits
+    func updateCache(path: String, content: String) {
+        queue.async { [weak self] in
+            self?.fileCache[path] = content
+        }
+    }
+
     // MARK: - Initial Scan
 
     private func scanDirectory(_ directory: String) {

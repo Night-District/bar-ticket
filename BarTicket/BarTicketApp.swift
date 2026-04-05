@@ -54,7 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // Populate recent issues from SwiftData
-        let seenDescriptor = FetchDescriptor<SeenTodo>()
+        var seenDescriptor = FetchDescriptor<SeenTodo>(sortBy: [SortDescriptor(\.createdAt, order: .reverse)])
         if let seenTodos = try? context.fetch(seenDescriptor) {
             appState.recentIssues = seenTodos
                 .filter { $0.issueURL != nil }
@@ -109,14 +109,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setupDynamicIsland() {
-        let controller = DynamicIslandController()
-        appState.islandController = controller
-
-        controller.setClickHandler { urlString in
-            if let url = URL(string: urlString) {
-                NSWorkspace.shared.open(url)
-            }
-        }
+        appState.islandController = DynamicIslandController()
     }
 
     // MARK: - TODO Handling Pipeline
@@ -138,12 +131,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        // Transition to creating state
         Task { @MainActor in
-            // Brief delay so detecting state is visible
-            try? await Task.sleep(for: .milliseconds(500))
+            // Hold detecting state so user can read it
+            try? await Task.sleep(for: .seconds(1.0))
 
+            // Transition to creating state
             appState.showIsland(state: .creating(title: todo.title))
+            let creatingShownAt = ContinuousClock.now
 
             do {
                 let response = try await GitHubClient.createIssue(
@@ -152,6 +146,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     title: todo.title,
                     body: todo.issueBody,
                     token: token
+                )
+
+                // Ensure creating state is visible for at least 1 second
+                let elapsed = ContinuousClock.now - creatingShownAt
+                if elapsed < .seconds(1.0) {
+                    try? await Task.sleep(for: .seconds(1.0) - elapsed)
+                }
+
+                // Append issue reference to the source file
+                appendIssueReference(
+                    filePath: todo.filePath,
+                    lineNumber: todo.lineNumber,
+                    issueNumber: response.number,
+                    issueURL: response.htmlUrl
                 )
 
                 // Save to SwiftData
@@ -191,5 +199,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 print("[BarTicket] Error creating issue: \(error)")
             }
         }
+    }
+
+    private func appendIssueReference(filePath: String, lineNumber: Int, issueNumber: Int, issueURL: String) {
+        guard var lines = try? String(contentsOfFile: filePath, encoding: .utf8)
+                .components(separatedBy: .newlines) else { return }
+
+        let index = lineNumber - 1
+        guard index >= 0, index < lines.count else { return }
+
+        let line = lines[index]
+        let ref = "(#\(issueNumber) \(issueURL))"
+
+        // Don't append if already has a reference
+        guard !line.contains("(#\(issueNumber)") else { return }
+
+        lines[index] = line + " " + ref
+
+        let updated = lines.joined(separator: "\n")
+        try? updated.write(toFile: filePath, atomically: true, encoding: .utf8)
+
+        // Update the file cache so this edit doesn't re-trigger detection
+        appState.fileWatcher?.updateCache(path: filePath, content: updated)
     }
 }
