@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(swift --version)",
+      "Bash(xcodebuild -version)",
+      "Bash(brew install:*)",
+      "Bash(xcodegen generate:*)",
+      "Bash(xcodebuild -project BarTicket.xcodeproj -scheme BarTicket -destination 'platform=macOS' build)",
+      "WebSearch",
+      "WebFetch(domain:docs.github.com)",
+      "Bash(security delete-generic-password:*)",
+      "Bash(gh repo:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(git ls-remote:*)",
+      "Bash(cp /Users/loganriedley/Developer/night-district/night-district-core/app/assets/images/logo.png /Users/loganriedley/Developer/night-district/bar-ticket-site/assets/img/logo.png)",
+      "Bash(cp /Users/loganriedley/Developer/night-district/night-district-core/app/assets/images/logo.svg /Users/loganriedley/Developer/night-district/bar-ticket-site/assets/img/logo.svg)",
+      "Bash(open:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh org:*)",
+      "Bash(git push:*)",
+      "Bash(gh api:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(gh run:*)"
+    ]
+  }
+}
