@@ -2,3 +2,4 @@
 *.xcuserdatad
 DerivedData/
 xcuserdata/
+.claude/settings.local.json
