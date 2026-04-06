@@ -4,7 +4,9 @@ import SwiftData
 @main
 struct BarTicketApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-
+    
+    //TODO: design/primary-color (#55 https://github.com/Night-District/bar-ticket/issues/55)
+    // Set up primary color to use Night District's pink and implement a consistent color scheme across the app (island, menu, settings, etc.)
     var body: some Scene {
         MenuBarExtra("Bar Ticket", systemImage: "ticket.fill") {
             SettingsView()
@@ -21,7 +23,9 @@ struct BarTicketApp: App {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let appState = AppState()
-
+    
+    //TODO: feat/add-schema (#54 https://github.com/Night-District/bar-ticket/issues/54)
+    // Add schemas to support database migrations 
     let modelContainer: ModelContainer = {
         let schema = Schema([
             AppSettings.self,
