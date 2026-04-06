@@ -2,26 +2,25 @@
 
 **Invocation:** `/plan [branch-name] [feature-description]`
 
-**Purpose:** Interactive planning session that asks clarifying questions about your feature and produces a detailed implementation plan.
+**Purpose:** Spawns the bar-ticket-feature-planner agent to conduct an interactive planning session, ask clarifying questions, and produce a detailed implementation plan.
 
 ## What it does
 
 1. Takes a branch name and initial feature description
-2. **Asks clarifying questions** about:
-   - Feature scope and impact area (app, website, or both)
-   - Technical approach and design pattern
-   - User-facing changes vs. internal improvements
-   - Performance or complexity concerns
-   - Dependencies or integration points
-3. Presents multiple choice answers or allows custom input
-4. Uses your answers to design the technical solution
-5. If website changes are needed, consults the `bar-ticket-site-developer` agent
-6. Generates a comprehensive plan and saves to `.claude/plans/`
+2. **Spawns the bar-ticket-feature-planner agent** which:
+   - Asks clarifying questions about feature scope and technical approach
+   - Presents multiple choice answers with custom input options
+   - Analyzes the Bar Ticket architecture and affected components
+   - Designs the technical solution aligned with existing patterns
+   - **Spawns the bar-ticket-site-developer agent if website changes are needed**
+   - Generates a comprehensive plan with both app and website sections
+3. Returns a detailed plan that you can review and refine
+4. Saves the plan to `.claude/plans/` for future reference
 
 ## Prerequisites
 
 - Branch name follows Night District conventions: `feat/`, `fix/`, `change/`, `test/`, `design/`
-- Have a rough idea of what you want to build (details refined during Q&A)
+- Have a rough idea of what you want to build (details refined during planning)
 
 ## Usage
 
@@ -29,48 +28,46 @@
 /plan feat/dark-mode "Add dark mode support"
 ```
 
-Claude will then ask:
+The bar-ticket-feature-planner agent will:
 
-> **Where should dark mode be implemented?**
-> - [ ] App UI only
-> - [ ] Website only
-> - [ ] Both app and website
-> - [ ] Other: _____
+1. **Ask clarifying questions:**
+   - Where should this be implemented? (app/website/both)
+   - What's the primary technical challenge?
+   - Which components are affected?
+   - Are there performance constraints?
+   - Is this a user-facing feature or internal improvement?
 
-> **What triggers dark mode?**
-> - [ ] System preference (macOS dark mode)
-> - [ ] Manual toggle in settings
-> - [ ] Both
-> - [ ] Other: _____
+2. **Reference Bar Ticket architecture:**
+   - Identify affected services (FileWatcher, TodoParser, GitHubClient, etc.)
+   - Check existing patterns (Observable ViewModels, SwiftData persistence, etc.)
+   - Consider Dynamic Island UI implications
+   - Plan state management changes
 
-> **Should dark mode persist across restarts?**
-> - [ ] Yes, save preference
-> - [ ] Always follow system
-> - [ ] Other: _____
+3. **Spawn sub-agents as needed:**
+   - Automatically spawn bar-ticket-site-developer if website changes needed
+   - Get specific website recommendations integrated into final plan
 
-## Interactive question types
-
-Questions present:
-- **Single select** — Pick one option
-- **Multiple select** — Pick one or more options
-- **Custom text** — Always has "Other: ___" option for custom answers
-- **Yes/No** — Quick decisions
-- **Numeric** — Performance budgets, timeouts, etc.
-
-See `.claude/skills/planning/questions.md` for the full list of questions Claude will ask.
+4. **Deliver a complete plan:**
+   - Feature summary and scope
+   - Technical architecture with design rationale
+   - Phased implementation steps (specific files, code patterns)
+   - Testing strategy
+   - Website updates (if applicable)
+   - Git workflow and deployment notes
 
 ## Plan output
 
 The generated plan includes:
 
-1. **Overview** — Feature summary derived from your answers
-2. **Scope** — What's included and what's not
-3. **Architecture** — Technical design based on your choices
-4. **Implementation Steps** — Phased breakdown with clear milestones
-5. **Bar Ticket Website** — If applicable, specific website changes
-6. **Testing** — Verification strategy for your feature
-7. **Files to change** — Exact files you'll modify
-8. **Decisions log** — Why specific choices were made
+1. **Feature Summary** — One-sentence distillation of what you're building
+2. **User Value** — Why this feature matters
+3. **Technical Components Affected** — Which services/views/models change
+4. **Implementation Approach** — High-level design and patterns
+5. **Specific Tasks** — Numbered, concrete tasks with file paths
+6. **Dependencies & Risks** — External dependencies, edge cases
+7. **Testing Strategy** — How to validate the feature
+8. **Bar Ticket Website** — If applicable, specific website changes with code examples
+9. **Git Workflow** — Branch naming and commit message format
 
 ## Plan attributes
 
@@ -82,7 +79,7 @@ branch: feat/feature-name
 description: What this feature does
 date: 2026-04-05
 scope: app | website | both
-technical_approach: [key decisions]
+technical_approach: [key decisions from planner]
 ---
 ```
 
@@ -91,18 +88,39 @@ technical_approach: [key decisions]
 ```
 /plan feat/dynamic-island-animation "Improve notch animation performance"
 
-❓ "Where is the performance issue?"
-→ ☑️ Notch state transitions are janky
+[bar-ticket-feature-planner agent starts interactive session]
 
-❓ "What's the target frame rate?"
-→ 60 FPS (selected)
+❓ Where is the performance issue?
+→ ☑️ Notch state transitions are janky on older Macs
 
-❓ "Should we cache icon states?"
-→ Yes, custom cache strategy per icon type
+❓ What's the target frame rate?
+→ 60 FPS (CADisplayLink requirement)
+
+❓ Should we optimize rendering or caching?
+→ Both: predictive state caching + GPU-optimized animations
+
+[agent analyzes DynamicNotchKit and NotchViewModel]
+
+[agent spawns bar-ticket-site-developer to plan performance demo updates]
 
 📋 Plan created: .claude/plans/feat-dynamic-island-animation.md
 
-✓ Problem identified: State transition lag
-✓ Solution: Implement predictive caching with debouncing
+✓ Problem identified and architecture designed
+✓ 8 implementation tasks with file paths
+✓ Website updates planned (performance metrics demo)
 ✓ Ready to develop on feat/dynamic-island-animation
 ```
+
+## How the agent works
+
+The bar-ticket-feature-planner agent:
+- Reads Bar Ticket codebase to understand current architecture
+- References CLAUDE.md for conventions and patterns
+- Asks structured questions with predefined answers + custom option
+- Maps feature requirements to concrete code changes
+- Considers integration points between services
+- Plans testing strategy (notched/non-notched Macs, etc.)
+- Optionally spawns bar-ticket-site-developer for website planning
+- Documents all decisions with rationale
+
+See `.claude/agents/bar-ticket-feature-planner.md` for agent instructions and `.claude/skills/planning/questions.md` for the full question list the agent uses.
