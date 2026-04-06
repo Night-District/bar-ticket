@@ -6,6 +6,7 @@ final class WatchedDirectory {
     var path: String
     var isEnabled: Bool
     var addedAt: Date
+    var selectedProjectNodeId: String?
 
     init(path: String, isEnabled: Bool = true) {
         self.path = path

@@ -17,6 +17,10 @@ final class NotchViewModel {
     var title: String = ""
     var subtitle: String = ""
     var issueURL: String?
+    var projectName: String?
+    var projectURL: String?
+    var projectFailed: Bool = false
+    var isV2Project: Bool = false
 }
 
 @MainActor
@@ -41,6 +45,10 @@ final class DynamicIslandController {
             viewModel.title = "TODO detected"
             viewModel.subtitle = title
             viewModel.issueURL = nil
+            viewModel.projectName = nil
+            viewModel.projectURL = nil
+            viewModel.projectFailed = false
+            viewModel.isV2Project = false
 
         case .creating(let title):
             viewModel.icon = "arrow.trianglehead.2.counterclockwise"
@@ -49,14 +57,22 @@ final class DynamicIslandController {
             viewModel.title = "Creating issue..."
             viewModel.subtitle = title
             viewModel.issueURL = nil
+            viewModel.projectName = nil
+            viewModel.projectURL = nil
+            viewModel.projectFailed = false
+            viewModel.isV2Project = false
 
-        case .confirmed(_, let repoFullName, let issueNumber, let issueURL):
+        case .confirmed(_, let repoFullName, let issueNumber, let issueURL, let projectName, let projectURL, let projectFailed, let isV2):
             viewModel.icon = "checkmark.circle.fill"
             viewModel.iconColor = .green
             viewModel.iconAnimation = .pulsing
             viewModel.title = "Pushed #\(issueNumber)"
             viewModel.subtitle = repoFullName
             viewModel.issueURL = issueURL
+            viewModel.projectName = projectName
+            viewModel.projectURL = projectURL
+            viewModel.projectFailed = projectFailed
+            viewModel.isV2Project = isV2
 
         case .error(let message):
             viewModel.icon = "xmark.circle.fill"
@@ -65,6 +81,10 @@ final class DynamicIslandController {
             viewModel.title = "Failed"
             viewModel.subtitle = message
             viewModel.issueURL = nil
+            viewModel.projectName = nil
+            viewModel.projectURL = nil
+            viewModel.projectFailed = false
+            viewModel.isV2Project = false
         }
 
         if !isVisible {
@@ -122,7 +142,7 @@ struct NotchExpandedView: View {
             )
             .frame(width: 30, height: 30)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(viewModel.title)
                     .font(.headline)
                     .foregroundStyle(.white)
@@ -131,6 +151,15 @@ struct NotchExpandedView: View {
                     Text(viewModel.subtitle)
                         .font(.caption2)
                         .foregroundStyle(.white.opacity(0.5))
+                }
+
+                if let projectName = viewModel.projectName {
+                    ProjectBadge(
+                        name: projectName,
+                        urlString: viewModel.projectURL,
+                        isV2: viewModel.isV2Project,
+                        failed: viewModel.projectFailed
+                    )
                 }
             }
 
@@ -152,7 +181,54 @@ struct NotchExpandedView: View {
                 .buttonStyle(.plain)
             }
         }
-        .frame(height: 40)
+        .frame(minHeight: 40)
+        .padding(.vertical, 4)
+    }
+}
+
+// MARK: - ProjectBadge
+
+struct ProjectBadge: View {
+    let name: String
+    let urlString: String?
+    let isV2: Bool
+    let failed: Bool
+
+    private var badgeColor: Color {
+        failed ? .orange : (isV2 ? Color(red: 0.47, green: 0.36, blue: 0.96) : .blue)
+    }
+
+    private var icon: String {
+        failed ? "exclamationmark.triangle.fill" : (isV2 ? "sparkles" : "folder.fill")
+    }
+
+    private var label: String {
+        failed ? "Failed: \(name)" : name
+    }
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(badgeColor)
+
+            Text(label)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(.white.opacity(0.9))
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 7)
+        .padding(.vertical, 3)
+        .background {
+            Capsule()
+                .fill(badgeColor.opacity(0.18))
+                .overlay(Capsule().strokeBorder(badgeColor.opacity(0.4), lineWidth: 0.5))
+        }
+        .onTapGesture {
+            if let urlString, let url = URL(string: urlString) {
+                NSWorkspace.shared.open(url)
+            }
+        }
     }
 }
 

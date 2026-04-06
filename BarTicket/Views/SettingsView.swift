@@ -7,6 +7,7 @@ struct SettingsView: View {
     @Query private var settings: [AppSettings]
     @Query(sort: \WatchedDirectory.addedAt, order: .reverse) private var directories: [WatchedDirectory]
     @Query(sort: \SeenTodo.createdAt, order: .reverse) private var seenTodos: [SeenTodo]
+    @Query private var cachedProjects: [ProjectCache]
 
     @State private var tokenInput = ""
     @State private var showTokenField = false
@@ -38,8 +39,6 @@ struct SettingsView: View {
 
             Divider()
 
-            //TODO: change/refactor-view (#33 https://github.com/Night-District/bar-ticket/issues/33)
-            // Refactor this view to use a List with sections instead of multiple GroupBoxes inside a ScrollView. This will give us built-in support for headers, footers, and better performance with large data sets. The current implementation is fine for a small number of settings, but it may become unwieldy as we add more features in the future.
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     // GitHub Token
@@ -93,7 +92,7 @@ struct SettingsView: View {
                                     .padding(.vertical, 4)
                             } else {
                                 ForEach(directories) { dir in
-                                    HStack {
+                                    HStack(spacing: 6) {
                                         Image(systemName: "folder.fill")
                                             .font(.caption)
                                             .foregroundStyle(.blue.opacity(0.7))
@@ -102,6 +101,11 @@ struct SettingsView: View {
                                             .lineLimit(1)
                                             .truncationMode(.middle)
                                         Spacer()
+                                        ProjectDropdownButton(
+                                            directory: dir,
+                                            cachedProjects: cachedProjects,
+                                            token: appState.githubToken
+                                        )
                                         Button {
                                             modelContext.delete(dir)
                                             try? modelContext.save()
@@ -233,5 +237,152 @@ struct SettingsView: View {
     private func restartWatcher() {
         let enabledPaths = directories.filter(\.isEnabled).map(\.path)
         appState.fileWatcher?.startWatching(directories: enabledPaths, performInitialScan: true)
+    }
+}
+
+// MARK: - ProjectDropdownButton
+
+struct ProjectDropdownButton: View {
+    let directory: WatchedDirectory
+    let cachedProjects: [ProjectCache]
+    let token: String?
+
+    @Environment(\.modelContext) private var modelContext
+
+    @State private var isFetching = false
+    @State private var fetchError: String?
+
+    private var selectedProject: ProjectCache? {
+        guard let id = directory.selectedProjectNodeId else { return nil }
+        return cachedProjects.first { $0.projectNodeId == id }
+    }
+
+    private var grouped: [(owner: String, projects: [ProjectCache])] {
+        let byOwner = Dictionary(grouping: cachedProjects, by: \.owner)
+        return byOwner.keys.sorted().map { owner in
+            (owner: owner, projects: byOwner[owner]!.sorted { $0.displayName < $1.displayName })
+        }
+    }
+
+    var body: some View {
+        Menu {
+            // Refresh option
+            Button {
+                Task { await fetchProjects() }
+            } label: {
+                if isFetching {
+                    Label("Fetching…", systemImage: "arrow.clockwise")
+                } else {
+                    Label("Refresh Projects", systemImage: "arrow.clockwise")
+                }
+            }
+            .disabled(isFetching || token == nil)
+
+            if let error = fetchError {
+                Text("⚠ \(error)").foregroundStyle(.secondary)
+            }
+
+            if !cachedProjects.isEmpty {
+                Divider()
+
+                // No project option
+                Button {
+                    directory.selectedProjectNodeId = nil
+                    try? modelContext.save()
+                } label: {
+                    HStack {
+                        Text("No project")
+                        if directory.selectedProjectNodeId == nil {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+
+                Divider()
+
+                // Grouped by owner
+                ForEach(grouped, id: \.owner) { group in
+                    Section(group.owner) {
+                        ForEach(group.projects, id: \.projectNodeId) { project in
+                            Button {
+                                directory.selectedProjectNodeId = project.projectNodeId
+                                try? modelContext.save()
+                            } label: {
+                                HStack {
+                                    Image(systemName: project.isV2 ? "sparkles" : "folder.fill")
+                                    Text(project.displayName)
+                                    if directory.selectedProjectNodeId == project.projectNodeId {
+                                        Spacer()
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: selectedProject.map { $0.isV2 ? "sparkles" : "folder.badge.checkmark" } ?? "folder.badge.plus")
+                    .font(.system(size: 10))
+                    .foregroundStyle(selectedProject != nil ? .blue : .secondary)
+                Text(selectedProject?.displayName ?? "Project")
+                    .font(.caption2)
+                    .foregroundStyle(selectedProject != nil ? .primary : .secondary)
+                    .lineLimit(1)
+            }
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3)
+            .background(.blue.opacity(selectedProject != nil ? 0.12 : 0.05), in: Capsule())
+            .overlay(Capsule().strokeBorder(.blue.opacity(selectedProject != nil ? 0.3 : 0.15), lineWidth: 0.5))
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        .onAppear {
+            if cachedProjects.isEmpty, token != nil {
+                Task { await fetchProjects() }
+            }
+        }
+    }
+
+    private func fetchProjects() async {
+        guard let token else { return }
+
+        // Determine owner from the directory's git remote
+        guard let repoInfo = resolveOwner() else {
+            fetchError = "Could not resolve git remote"
+            return
+        }
+
+        isFetching = true
+        fetchError = nil
+
+        do {
+            let projects = try await GitHubProjectsClient.fetchProjects(owner: repoInfo, token: token)
+
+            // Upsert into cache
+            let existingIds = Set(cachedProjects.map(\.projectNodeId))
+            for project in projects {
+                if !existingIds.contains(project.projectNodeId) {
+                    modelContext.insert(project)
+                }
+            }
+            try? modelContext.save()
+        } catch {
+            fetchError = error.localizedDescription
+            print("[BarTicket] Failed to fetch projects: \(error)")
+        }
+
+        isFetching = false
+    }
+
+    private func resolveOwner() -> String? {
+        // Use any file in the directory to resolve git remote
+        let testPath = directory.path + "/.git/config"
+        if let repoInfo = GitResolver.resolve(filePath: testPath) {
+            return repoInfo.owner
+        }
+        // Fallback: try the directory path itself
+        return GitResolver.resolve(filePath: directory.path + "/placeholder")?.owner
     }
 }

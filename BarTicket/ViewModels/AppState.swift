@@ -5,7 +5,16 @@ enum IslandState: Equatable {
     case hidden
     case detecting(title: String)
     case creating(title: String)
-    case confirmed(title: String, repoFullName: String, issueNumber: Int, issueURL: String)
+    case confirmed(
+        title: String,
+        repoFullName: String,
+        issueNumber: Int,
+        issueURL: String,
+        projectName: String?,
+        projectURL: String?,
+        projectFailed: Bool,
+        isV2Project: Bool
+    )
     case error(message: String)
 }
 

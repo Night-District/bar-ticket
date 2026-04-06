@@ -134,9 +134,13 @@ enum TodoParser {
                     }
                 }
 
-                let title = blockLines.first ?? todoText
-                let body = blockLines.dropFirst().joined(separator: "\n")
-                let fullContent = blockLines.joined(separator: "\n")
+                // Strip appended issue references before hashing so that
+                // "(#42 https://...)" appended by appendIssueReference doesn't
+                // produce a new hash and re-trigger issue creation.
+                let strippedLines = blockLines.map(stripIssueReferences)
+                let title = strippedLines.first ?? todoText
+                let body = strippedLines.dropFirst().joined(separator: "\n")
+                let fullContent = strippedLines.joined(separator: "\n")
                 let hash = SeenTodo.hash(content: fullContent)
 
                 guard !title.isEmpty else {
@@ -158,6 +162,15 @@ enum TodoParser {
         }
 
         return todos
+    }
+
+    /// Remove appended issue references like " (#42 https://github.com/...)" from a line.
+    private static func stripIssueReferences(_ text: String) -> String {
+        text.replacingOccurrences(
+            of: #"\s*\(#\d+ https?://\S+\)"#,
+            with: "",
+            options: .regularExpression
+        ).trimmingCharacters(in: .whitespaces)
     }
 
     /// Detect which single-line comment prefix is used on a line

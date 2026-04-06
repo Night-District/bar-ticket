@@ -40,7 +40,10 @@
       "Bash(rm -f .claude/plans/feat-interactive-test.md)",
       "Bash(git commit -m 'Update /plan skill with interactive questioning:*)",
       "Bash(git commit -m 'Add bar-ticket-site-developer agent integration to feature planner:*)",
-      "Bash(git commit -m 'Update /plan skill to use bar-ticket-feature-planner agent:*)"
+      "Bash(git commit -m 'Update /plan skill to use bar-ticket-feature-planner agent:*)",
+      "Bash(git commit -m 'add GitHub Projects integration \\(Classic + v2\\):*)",
+      "Bash(git commit -m 'drop Classic projects; fix GraphQL partial error handling:*)",
+      "Bash(git commit -m 'strip issue references before hashing to prevent re-trigger loop:*)"
     ]
   }
 }
