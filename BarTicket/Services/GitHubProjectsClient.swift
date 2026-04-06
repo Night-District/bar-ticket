@@ -19,7 +19,6 @@ private struct FetchProjectsData: Decodable {
 
 private struct OwnerProjectsData: Decodable {
     let projectsV2: ProjectV2Connection?
-    let projects: ClassicProjectConnection?
 }
 
 private struct ProjectV2Connection: Decodable {
@@ -32,39 +31,12 @@ private struct ProjectV2Node: Decodable {
     let url: String
 }
 
-private struct ClassicProjectConnection: Decodable {
-    let nodes: [ClassicProjectNode]
-}
-
-private struct ClassicProjectNode: Decodable {
-    let id: String
-    let name: String
-    let url: String
-    let columns: ClassicColumnConnection?
-}
-
-private struct ClassicColumnConnection: Decodable {
-    let nodes: [ClassicColumnNode]
-}
-
-private struct ClassicColumnNode: Decodable {
-    let id: String
-}
-
 private struct AddV2ItemData: Decodable {
     let addProjectV2ItemById: AddV2ItemResult?
 }
 
 private struct AddV2ItemResult: Decodable {
     let item: AddedItem?
-}
-
-private struct AddProjectCardData: Decodable {
-    let addProjectCard: AddProjectCardResult?
-}
-
-private struct AddProjectCardResult: Decodable {
-    let projectCard: AddedItem?
 }
 
 private struct AddedItem: Decodable {
@@ -76,14 +48,12 @@ private struct AddedItem: Decodable {
 enum GitHubProjectsError: LocalizedError {
     case noToken
     case graphQLError(String)
-    case noColumnsFound
     case assignmentFailed
 
     var errorDescription: String? {
         switch self {
         case .noToken:              return "No GitHub token configured"
         case .graphQLError(let m):  return m
-        case .noColumnsFound:       return "Classic project has no columns"
         case .assignmentFailed:     return "Failed to assign issue to project"
         }
     }
@@ -104,8 +74,8 @@ enum GitHubProjectsClient {
 
     // MARK: Fetch Projects
 
-    /// Fetches Classic and v2 projects for the given owner (org or user).
-    /// Returns a flat list of ProjectCache objects ready to be inserted into SwiftData.
+    /// Fetches v2 projects for the given owner (org or user).
+    /// Queries both organization and user — whichever matches the login returns data.
     static func fetchProjects(owner: String, token: String) async throws -> [ProjectCache] {
         let query = """
         query FetchOwnerProjects($owner: String!) {
@@ -113,22 +83,10 @@ enum GitHubProjectsClient {
             projectsV2(first: 50) {
               nodes { id title url }
             }
-            projects(first: 50) {
-              nodes {
-                id name url
-                columns(first: 1) { nodes { id } }
-              }
-            }
           }
           user(login: $owner) {
             projectsV2(first: 50) {
               nodes { id title url }
-            }
-            projects(first: 50) {
-              nodes {
-                id name url
-                columns(first: 1) { nodes { id } }
-              }
             }
           }
         }
@@ -150,15 +108,19 @@ enum GitHubProjectsClient {
         .serializingDecodable(GraphQLResponse<FetchProjectsData>.self)
         .value
 
+        // GitHub returns partial errors when one of organization/user doesn't match the login
+        // (e.g. querying user(login:) for an org). This is expected — log and continue.
         if let errors = response.errors, !errors.isEmpty {
-            throw GitHubProjectsError.graphQLError(errors.map(\.message).joined(separator: "; "))
+            let messages = errors.map(\.message).joined(separator: "; ")
+            if response.data == nil {
+                throw GitHubProjectsError.graphQLError(messages)
+            }
+            print("[BarTicket] GraphQL partial errors (non-fatal): \(messages)")
         }
 
         var results: [ProjectCache] = []
 
-        // Collect from org or user — whichever has data
         for ownerData in [response.data?.organization, response.data?.user].compactMap({ $0 }) {
-            // v2 projects
             for node in ownerData.projectsV2?.nodes ?? [] {
                 results.append(ProjectCache(
                     projectNodeId: node.id,
@@ -168,18 +130,6 @@ enum GitHubProjectsClient {
                     projectURL: node.url
                 ))
             }
-            // Classic projects
-            for node in ownerData.projects?.nodes ?? [] {
-                let firstColumnId = node.columns?.nodes.first?.id
-                results.append(ProjectCache(
-                    projectNodeId: node.id,
-                    displayName: node.name,
-                    owner: owner,
-                    isV2: false,
-                    projectURL: node.url,
-                    firstColumnNodeId: firstColumnId
-                ))
-            }
         }
 
         return results
@@ -187,26 +137,10 @@ enum GitHubProjectsClient {
 
     // MARK: Add Issue to Project
 
-    /// Adds an issue to a project. For v2 projects uses addProjectV2ItemById; for Classic
-    /// projects uses addProjectCard into the first column.
+    /// Adds an issue to a v2 project using the addProjectV2ItemById mutation.
     static func addIssueToProject(
         issueNodeId: String,
         project: ProjectCache,
-        token: String
-    ) async throws {
-        if project.isV2 {
-            try await addToV2Project(issueNodeId: issueNodeId, projectNodeId: project.projectNodeId, token: token)
-        } else {
-            guard let columnId = project.firstColumnNodeId else {
-                throw GitHubProjectsError.noColumnsFound
-            }
-            try await addToClassicProject(issueNodeId: issueNodeId, columnNodeId: columnId, token: token)
-        }
-    }
-
-    private static func addToV2Project(
-        issueNodeId: String,
-        projectNodeId: String,
         token: String
     ) async throws {
         let mutation = """
@@ -219,7 +153,7 @@ enum GitHubProjectsClient {
 
         let body: [String: Any] = [
             "query": mutation,
-            "variables": ["projectId": projectNodeId, "contentId": issueNodeId]
+            "variables": ["projectId": project.projectNodeId, "contentId": issueNodeId]
         ]
 
         let response = try await AF.request(
@@ -238,44 +172,6 @@ enum GitHubProjectsClient {
         }
 
         guard response.data?.addProjectV2ItemById?.item != nil else {
-            throw GitHubProjectsError.assignmentFailed
-        }
-    }
-
-    private static func addToClassicProject(
-        issueNodeId: String,
-        columnNodeId: String,
-        token: String
-    ) async throws {
-        let mutation = """
-        mutation AddIssueToClassicProject($columnId: ID!, $contentId: ID!) {
-          addProjectCard(input: { projectColumnId: $columnId, contentId: $contentId }) {
-            projectCard { id }
-          }
-        }
-        """
-
-        let body: [String: Any] = [
-            "query": mutation,
-            "variables": ["columnId": columnNodeId, "contentId": issueNodeId]
-        ]
-
-        let response = try await AF.request(
-            graphqlURL,
-            method: .post,
-            parameters: body,
-            encoding: JSONEncoding.default,
-            headers: headers(token: token)
-        )
-        .validate()
-        .serializingDecodable(GraphQLResponse<AddProjectCardData>.self)
-        .value
-
-        if let errors = response.errors, !errors.isEmpty {
-            throw GitHubProjectsError.graphQLError(errors.map(\.message).joined(separator: "; "))
-        }
-
-        guard response.data?.addProjectCard?.projectCard != nil else {
             throw GitHubProjectsError.assignmentFailed
         }
     }

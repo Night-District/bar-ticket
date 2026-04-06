@@ -9,15 +9,13 @@ final class ProjectCache {
     var isV2: Bool          // true = ProjectsV2, false = Classic
     var projectURL: String
     var cachedAt: Date
-    var firstColumnNodeId: String?  // Classic projects only
 
     init(
         projectNodeId: String,
         displayName: String,
         owner: String,
         isV2: Bool,
-        projectURL: String,
-        firstColumnNodeId: String? = nil
+        projectURL: String
     ) {
         self.projectNodeId = projectNodeId
         self.displayName = displayName
@@ -25,6 +23,5 @@ final class ProjectCache {
         self.isV2 = isV2
         self.projectURL = projectURL
         self.cachedAt = Date()
-        self.firstColumnNodeId = firstColumnNodeId
     }
 }
