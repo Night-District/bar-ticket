@@ -10,7 +10,7 @@ struct BarTicketApp: App {
             SettingsView()
                 .environment(appDelegate.appState)
                 .modelContainer(appDelegate.modelContainer)
-                .frame(width: 380, height: 440)
+                .frame(width: 480, height: 440)
         }
         .menuBarExtraStyle(.window)
     }
@@ -26,7 +26,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let schema = Schema([
             AppSettings.self,
             WatchedDirectory.self,
-            SeenTodo.self
+            SeenTodo.self,
+            ProjectCache.self
         ])
         let config = ModelConfiguration("BarTicket", isStoredInMemoryOnly: false)
         do {
@@ -131,6 +132,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
+        // Find the watched directory entry for this file (to check for a selected project)
+        let dirDescriptor = FetchDescriptor<WatchedDirectory>()
+        let watchedDir = (try? context.fetch(dirDescriptor))?
+            .first { todo.filePath.hasPrefix($0.path) }
+
         Task { @MainActor in
             // Hold detecting state so user can read it
             try? await Task.sleep(for: .seconds(1.0))
@@ -185,12 +191,47 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 )
                 appState.addRecentIssue(created)
 
-                // Show confirmed
+                // Attempt project assignment (non-blocking; issue already created)
+                var projectName: String? = nil
+                var projectURL: String? = nil
+                var projectFailed = false
+
+                var isV2Project = false
+
+                if let selectedId = watchedDir?.selectedProjectNodeId {
+                    let projectDescriptor = FetchDescriptor<ProjectCache>()
+                    let project = (try? context.fetch(projectDescriptor))?
+                        .first { $0.projectNodeId == selectedId }
+
+                    if let project {
+                        projectName = project.displayName
+                        projectURL = project.projectURL
+                        isV2Project = project.isV2
+
+                        do {
+                            try await GitHubProjectsClient.addIssueToProject(
+                                issueNodeId: response.nodeId,
+                                project: project,
+                                token: token
+                            )
+                            print("[BarTicket] Issue #\(response.number) added to project '\(project.displayName)'")
+                        } catch {
+                            projectFailed = true
+                            print("[BarTicket] Project assignment failed: \(error)")
+                        }
+                    }
+                }
+
+                // Show confirmed (with project info if applicable)
                 appState.showIsland(state: .confirmed(
                     title: todo.title,
                     repoFullName: repoInfo.fullName,
                     issueNumber: response.number,
-                    issueURL: response.htmlUrl
+                    issueURL: response.htmlUrl,
+                    projectName: projectName,
+                    projectURL: projectURL,
+                    projectFailed: projectFailed,
+                    isV2Project: isV2Project
                 ))
 
                 print("[BarTicket] Issue created: #\(response.number) on \(repoInfo.fullName)")
