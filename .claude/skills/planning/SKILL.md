@@ -1,4 +1,15 @@
-# /plan — Plan a new Bar Ticket feature
+---
+name: planning
+description: Plan a new Bar Ticket feature
+argument-hint: Branch name | Feature description
+---
+
+## Context
+Parse $ARGUMENTS to get the following values:
+- [branch-name]: The name of the branch and PR title
+- [feature-description]: A description of the feature to plan
+
+# Plan a new Bar Ticket feature
 
 **Invocation:** `/plan [branch-name] [feature-description]`
 
@@ -6,7 +17,7 @@
 
 ## What it does
 
-1. Takes a branch name and initial feature description
+1. Takes a branch name and initial `[feature-description]`
 2. **Spawns the bar-ticket-feature-planner agent** which:
    - Asks clarifying questions about feature scope and technical approach
    - Presents multiple choice answers with custom input options

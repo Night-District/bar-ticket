@@ -27,7 +27,20 @@
       "Read(//Users/loganriedley/Desktop/BarTicket.app/**)",
       "Read(//Users/loganriedley/Desktop/**)",
       "Bash(hdiutil create:*)",
-      "Bash(chmod +x /Users/loganriedley/Developer/night-district/bar-ticket/.claude/skills/deploy/deploy.sh)"
+      "Bash(chmod +x /Users/loganriedley/Developer/night-district/bar-ticket/.claude/skills/deploy/deploy.sh)",
+      "Bash(bash:*)",
+      "Bash(md5 /Users/loganriedley/Downloads/bar-ticket-demo.mp4 /Users/loganriedley/Developer/night-district/bar-ticket-site/assets/video/demo.mp4)",
+      "Bash(git commit -m 'Replace IDE letter badges with proper SVG logos:*)",
+      "Bash(git commit -m 'Simplify IDE carousel to auto-scrolling logos:*)",
+      "Bash(git commit -m 'Add Zed to IDE logo carousel:*)",
+      "Bash(git commit -m 'Configure app icon from Icons folder:*)",
+      "Bash(chmod +x:*)",
+      "Bash(rm -f .claude/plans/feat-test-feature.md)",
+      "Bash(git commit -m 'Add /plan skill for feature planning:*)",
+      "Bash(rm -f .claude/plans/feat-interactive-test.md)",
+      "Bash(git commit -m 'Update /plan skill with interactive questioning:*)",
+      "Bash(git commit -m 'Add bar-ticket-site-developer agent integration to feature planner:*)",
+      "Bash(git commit -m 'Update /plan skill to use bar-ticket-feature-planner agent:*)"
     ]
   }
 }

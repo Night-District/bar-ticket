@@ -37,19 +37,11 @@
 		D521C60A90EFB5E998568CC8 /* WatchedDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchedDirectory.swift; sourceTree = "<group>"; };
 		DECD5A1F7EF0D6CCF93CEB93 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		ED211344F252E3986FB5AF04 /* SeenTodo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeenTodo.swift; sourceTree = "<group>"; };
-		F429A7C9C85509193C294206 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F429A7C9C85509193C294206 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F451F7E719B10F1621256F0A /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		F507DC7CA0D9F143237B4B34 /* BarTicketApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTicketApp.swift; sourceTree = "<group>"; };
 		F86C415F6801E38E222016DA /* DynamicIslandWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandWindow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		7C88A7B22F8248B400D52FCC /* Icons */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Icons;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		FA3148BFA8F5582B1D02C5C9 /* Frameworks */ = {
@@ -130,7 +122,6 @@
 			isa = PBXGroup;
 			children = (
 				780984CE20BCB862A4C328C0 /* BarTicket */,
-				7C88A7B22F8248B400D52FCC /* Icons */,
 				510EF9B748A97B2AD3CC0C4F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -174,6 +165,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 801D09E56011760D88BF4018 /* Build configuration list for PBXProject "BarTicket" */;
 			developmentRegion = en;
@@ -225,27 +218,20 @@
 		32110056F3D1961CFBAE52BB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = bar_ticket_icon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BarTicket/BarTicket.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
-				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = XK767LS9B3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BarTicket/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.nightdistrict.bar-ticket";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.10;
 			};
@@ -373,27 +359,20 @@
 		870149548319EBAD51DDA137 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = bar_ticket_icon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BarTicket/BarTicket.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
-				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = XK767LS9B3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BarTicket/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.nightdistrict.bar-ticket";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.10;
 			};
