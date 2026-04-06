@@ -34,81 +34,49 @@ if [ -f "$PLAN_FILE" ]; then
   exit 1
 fi
 
-# Create the plan with frontmatter
-cat > "$PLAN_FILE" << 'EOF'
+# Create initial plan with frontmatter
+cat > "$PLAN_FILE" << EOF
 ---
-branch: BRANCH_PLACEHOLDER
-description: DESCRIPTION_PLACEHOLDER
-date: DATE_PLACEHOLDER
+branch: $BRANCH
+description: $DESCRIPTION
+date: $TODAY
+scope:
+technical_approach:
 ---
 
-# Feature Plan: DESCRIPTION_PLACEHOLDER
+# Feature Plan: $DESCRIPTION
 
 ## Overview
 
-DESCRIPTION_PLACEHOLDER
+$DESCRIPTION
 
-### Scope
-- App implementation
-- Testing
-- Deployment
+## Scope
+
+(To be determined during planning session)
 
 ## Architecture
 
-### Key Components
-- Identify which existing components will be modified
-- New components if needed
-- Integration points
-
-### Design Decisions
-- Why this approach?
-- Alternatives considered
-- Trade-offs
+(To be determined during planning session)
 
 ## Implementation Steps
 
-### Phase 1: Core Implementation
-1. Identify files to modify
-2. Implement core logic
-3. Update views if needed
-4. Test changes
-
-### Phase 2: Integration
-1. Connect to existing systems
-2. Verify state management
-3. Handle edge cases
-
-### Phase 3: Polish
-1. Add animations/transitions
-2. Error handling
-3. Performance optimization
+(To be determined during planning session)
 
 ## Testing
 
-- [ ] Unit tests pass
-- [ ] Manual testing on M-series Mac
-- [ ] Manual testing on Intel Mac
-- [ ] Notch behavior verified
-- [ ] No regressions
+(To be determined during planning session)
 
 ## Files to Change
 
-- `BarTicket/BarTicketApp.swift` — Entry point
-- `BarTicket/ViewModels/AppState.swift` — State management
-- `BarTicket/Views/*.swift` — UI components
-- `BarTicket/Services/*.swift` — Business logic
+(To be determined during planning session)
 
 ## Notes
 
-Add implementation notes and gotchas here as you discover them.
+(Planning in progress...)
 
 EOF
 
-# Replace placeholders (using | as delimiter to avoid issues with / in branch names)
-sed -i '' "s|BRANCH_PLACEHOLDER|$BRANCH|g" "$PLAN_FILE"
-sed -i '' "s|DESCRIPTION_PLACEHOLDER|$DESCRIPTION|g" "$PLAN_FILE"
-sed -i '' "s|DATE_PLACEHOLDER|$TODAY|g" "$PLAN_FILE"
-
-echo "✓ Plan created: $PLAN_FILE"
+echo "✓ Planning session initiated: $PLAN_FILE"
 echo ""
-cat "$PLAN_FILE"
+echo "🤔 Claude will now ask clarifying questions to design the best solution."
+echo "   Answer with single/multiple selections or provide custom input."
