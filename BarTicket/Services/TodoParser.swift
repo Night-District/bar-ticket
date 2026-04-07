@@ -7,6 +7,8 @@ struct ParsedTodo {
     let filePath: String
     let lineNumber: Int
     let contentHash: String
+    let issueNumber: Int?
+    let repoFullName: String?
 
     /// Issue body formatted with metadata footer
     var issueBody: String {
@@ -19,6 +21,23 @@ struct ParsedTodo {
 
         return result
     }
+}
+
+/// Lightweight record of a TODO that already has a corresponding GitHub issue.
+/// Stored in FileWatcher so update detection survives across file events without
+/// requiring a SwiftData fetch on the watcher's background queue.
+struct IssuedTodoRecord {
+    let issueNumber: Int
+    let repoFullName: String
+    let contentHash: String
+    let issueURL: String?
+    let title: String
+}
+
+/// A TODO whose text has changed since its issue was created.
+struct UpdatedTodo {
+    let old: IssuedTodoRecord
+    let new: ParsedTodo
 }
 
 enum TodoParser {
@@ -134,6 +153,10 @@ enum TodoParser {
                     }
                 }
 
+                // Extract issue reference from raw first line before stripping,
+                // so we can identify this as a known TODO (already has an issue).
+                let issueRef = extractIssueReference(blockLines.first ?? todoText)
+
                 // Strip appended issue references before hashing so that
                 // "(#42 https://...)" appended by appendIssueReference doesn't
                 // produce a new hash and re-trigger issue creation.
@@ -154,7 +177,9 @@ enum TodoParser {
                     fullContent: fullContent,
                     filePath: filePath,
                     lineNumber: i + 1,
-                    contentHash: hash
+                    contentHash: hash,
+                    issueNumber: issueRef?.issueNumber,
+                    repoFullName: issueRef?.repoFullName
                 ))
             }
 
@@ -162,6 +187,47 @@ enum TodoParser {
         }
 
         return todos
+    }
+
+    /// Find TODOs whose content has changed since their issue was created.
+    /// Matches by the embedded `(#N url)` reference — immune to line number drift.
+    static func findUpdatedTodos(
+        currentContent: String,
+        filePath: String,
+        issuedTodos: [IssuedTodoRecord]
+    ) -> [UpdatedTodo] {
+        guard !issuedTodos.isEmpty else { return [] }
+
+        let currentTodos = parseTodos(from: currentContent, filePath: filePath)
+        var updated: [UpdatedTodo] = []
+
+        for parsed in currentTodos {
+            guard let issueNumber = parsed.issueNumber,
+                  let repoFullName = parsed.repoFullName else { continue }
+
+            guard let record = issuedTodos.first(where: {
+                $0.issueNumber == issueNumber && $0.repoFullName == repoFullName
+            }) else { continue }
+
+            if parsed.contentHash != record.contentHash {
+                updated.append(UpdatedTodo(old: record, new: parsed))
+            }
+        }
+
+        return updated
+    }
+
+    /// Extract the embedded issue reference from a TODO comment body line.
+    /// Matches the `(#N https://github.com/owner/repo/issues/N)` suffix.
+    private static func extractIssueReference(_ text: String) -> (issueNumber: Int, repoFullName: String)? {
+        let pattern = #"\(#(\d+)\s+https://github\.com/([^/]+/[^/]+)/issues/\d+\)"#
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
+              let numRange = Range(match.range(at: 1), in: text),
+              let repoRange = Range(match.range(at: 2), in: text),
+              let number = Int(text[numRange])
+        else { return nil }
+        return (issueNumber: number, repoFullName: String(text[repoRange]))
     }
 
     /// Remove appended issue references like " (#42 https://github.com/...)" from a line.

@@ -8,10 +8,14 @@ final class FileWatcher {
     private let queue = DispatchQueue(label: "com.nightdistrict.bar-ticket.filewatcher", qos: .utility)
     private var fileCache: [String: String] = [:] // filePath → lastKnownContent
     private var seenHashes: Set<String> = []
+    private var issuedTodos: [IssuedTodoRecord] = []
     private var isRunning = false
 
     /// Called when a new TODO is detected
     var onTodoDetected: ((ParsedTodo) -> Void)?
+
+    /// Called when an existing TODO's content changes (identified by embedded #N reference)
+    var onTodoUpdated: ((UpdatedTodo) -> Void)?
 
     // MARK: - Lifecycle
 
@@ -56,6 +60,22 @@ final class FileWatcher {
 
     func addSeenHash(_ hash: String) {
         seenHashes.insert(hash)
+    }
+
+    func loadIssuedTodos(_ records: [IssuedTodoRecord]) {
+        issuedTodos = records
+    }
+
+    func addIssuedTodo(_ record: IssuedTodoRecord) {
+        issuedTodos.append(record)
+    }
+
+    func updateIssuedTodo(_ record: IssuedTodoRecord) {
+        if let idx = issuedTodos.firstIndex(where: {
+            $0.issueNumber == record.issueNumber && $0.repoFullName == record.repoFullName
+        }) {
+            issuedTodos[idx] = record
+        }
     }
 
     /// Update the cached content for a file to prevent re-triggering on our own edits
@@ -170,22 +190,40 @@ final class FileWatcher {
             seenHashes: seenHashes
         )
 
+        // Find updated TODOs (existing issues whose text changed)
+        let updatedTodos = TodoParser.findUpdatedTodos(
+            currentContent: currentContent,
+            filePath: path,
+            issuedTodos: issuedTodos
+        )
+
         // Update cache
         fileCache[path] = currentContent
 
-        if newTodos.isEmpty {
-            print("[BarTicket] No new TODOs (all \(allCurrentTodos.count) already seen or in previous cache)")
-        } else {
-            print("[BarTicket] Found \(newTodos.count) new TODO(s) in \(path)")
-            for todo in newTodos {
-                print("[BarTicket]   -> \"\(todo.title)\" (hash: \(todo.contentHash.prefix(12))...)")
-            }
+        if newTodos.isEmpty && updatedTodos.isEmpty {
+            print("[BarTicket] No new or updated TODOs (all \(allCurrentTodos.count) already seen or in previous cache)")
         }
 
         // Notify for each new TODO
         for todo in newTodos {
+            print("[BarTicket] New TODO: \"\(todo.title)\" (hash: \(todo.contentHash.prefix(12))...)")
             seenHashes.insert(todo.contentHash)
             onTodoDetected?(todo)
+        }
+
+        // Notify for each updated TODO
+        for updated in updatedTodos {
+            print("[BarTicket] Updated TODO: \"\(updated.new.title)\" (issue #\(updated.old.issueNumber) on \(updated.old.repoFullName))")
+            seenHashes.insert(updated.new.contentHash)
+            seenHashes.remove(updated.old.contentHash)
+            updateIssuedTodo(IssuedTodoRecord(
+                issueNumber: updated.old.issueNumber,
+                repoFullName: updated.old.repoFullName,
+                contentHash: updated.new.contentHash,
+                issueURL: updated.old.issueURL,
+                title: updated.new.title
+            ))
+            onTodoUpdated?(updated)
         }
     }
 }
