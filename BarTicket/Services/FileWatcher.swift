@@ -200,12 +200,17 @@ final class FileWatcher {
         // Update cache
         fileCache[path] = currentContent
 
-        if newTodos.isEmpty && updatedTodos.isEmpty {
+        // Exclude from new TODOs anything already handled as an update — same edit,
+        // different hash, would otherwise fire both pipelines.
+        let updatedNewHashes = Set(updatedTodos.map(\.new.contentHash))
+        let trueNewTodos = newTodos.filter { !updatedNewHashes.contains($0.contentHash) }
+
+        if trueNewTodos.isEmpty && updatedTodos.isEmpty {
             print("[BarTicket] No new or updated TODOs (all \(allCurrentTodos.count) already seen or in previous cache)")
         }
 
         // Notify for each new TODO
-        for todo in newTodos {
+        for todo in trueNewTodos {
             print("[BarTicket] New TODO: \"\(todo.title)\" (hash: \(todo.contentHash.prefix(12))...)")
             seenHashes.insert(todo.contentHash)
             onTodoDetected?(todo)
