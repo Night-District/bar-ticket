@@ -54,23 +54,37 @@ final class FileWatcher {
         isRunning = false
     }
 
+    // All public mutation methods dispatch to `queue` so that reads/writes to
+    // seenHashes, issuedTodos, and fileCache are always serialized on the same
+    // executor as handleFileEvent. Callers (typically the main actor) must not
+    // access these collections directly.
+
     func loadSeenHashes(_ hashes: Set<String>) {
-        seenHashes = hashes
+        queue.async { [weak self] in
+            self?.seenHashes = hashes
+        }
     }
 
     func addSeenHash(_ hash: String) {
-        seenHashes.insert(hash)
+        queue.async { [weak self] in
+            self?.seenHashes.insert(hash)
+        }
     }
 
     func loadIssuedTodos(_ records: [IssuedTodoRecord]) {
-        issuedTodos = records
+        queue.async { [weak self] in
+            self?.issuedTodos = records
+        }
     }
 
     func addIssuedTodo(_ record: IssuedTodoRecord) {
-        issuedTodos.append(record)
+        queue.async { [weak self] in
+            self?.issuedTodos.append(record)
+        }
     }
 
-    func updateIssuedTodo(_ record: IssuedTodoRecord) {
+    // Internal — only called from handleFileEvent, which already runs on queue.
+    private func updateIssuedTodo(_ record: IssuedTodoRecord) {
         if let idx = issuedTodos.firstIndex(where: {
             $0.issueNumber == record.issueNumber && $0.repoFullName == record.repoFullName
         }) {
