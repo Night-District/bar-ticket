@@ -33,13 +33,6 @@ if [ -d "$MOUNT_POINT" ]; then
   hdiutil detach "$MOUNT_POINT" -quiet 2>/dev/null || true
 fi
 
-# ─── Verify background image exists ─────────────────────────────────────────
-if [ ! -f "$BACKGROUND_SRC" ]; then
-  echo "Background image not found at $BACKGROUND_SRC"
-  echo "Run: python3 $DEPLOY_DIR/generate-background.py"
-  exit 1
-fi
-
 # ─── Build staging folder ───────────────────────────────────────────────────
 # hdiutil blocks verification of *.app bundles by name in this environment.
 # We stage under a temporary name and rename via Finder after mounting.
@@ -69,8 +62,7 @@ echo "Mounting..."
 hdiutil attach "$RW_DMG" -mountpoint "$MOUNT_POINT" -nobrowse -quiet
 
 echo "Populating DMG..."
-# Copy non-.app items directly (symlink, background)
-ln -s /Applications "$MOUNT_POINT/Applications"
+osascript -e "tell application \"Finder\" to make alias file to POSIX file \"/Applications\" at POSIX file \"$MOUNT_POINT\""
 mkdir -p "$MOUNT_POINT/.background"
 cp "$BACKGROUND_SRC" "$MOUNT_POINT/.background/background.png"
 
@@ -101,13 +93,14 @@ tell application "Finder"
     set viewOptions to the icon view options of container window
     set arrangement of viewOptions to not arranged
     set icon size of viewOptions to 100
-    set text size of viewOptions to 13
+    set text size of viewOptions to 12
     set background picture of viewOptions to file ".background:background.png"
 
     delay 1
 
-    set position of item "$APP_NAME.app" of container window to {165, 175}
-    set position of item "Applications" of container window to {495, 175}
+    set position of item "$APP_NAME.app" of container window to {165, 170}
+    set position of item "Applications" of container window to {495, 170}
+    set position of item ".background" of container window to {999, 999}
 
     update without registering applications
     delay 2
@@ -139,7 +132,7 @@ echo "Created: BarTicket.dmg ($DMG_SIZE)"
 cd "$SITE_DIR"
 git checkout dev
 git add assets/releases/BarTicket.dmg
-git commit -m "Update Bar Ticket .dmg (v$APP_VERSION)
+git commit -m "change/.dmg(v$APP_VERSION)
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 git push origin dev

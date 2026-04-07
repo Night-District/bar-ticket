@@ -51,7 +51,26 @@
       "Bash(python3 -m venv /tmp/bt-venv)",
       "Bash(/tmp/bt-venv/bin/pip install:*)",
       "Bash(/tmp/bt-venv/bin/python3 /Users/loganriedley/Developer/night-district/bar-ticket/.claude/skills/deploy/generate-background.py)",
-      "Bash(gh pr create --title feat/drag-and-drop-installation --body ':*)"
+      "Bash(gh pr create --title feat/drag-and-drop-installation --body ':*)",
+      "Read(//Volumes/**)",
+      "Read(//private/tmp/bar-ticket-dmg-staging/**)",
+      "Bash(hdiutil detach:*)",
+      "Bash(mkdir \"/Volumes/Bar Ticket/BarTicket.app\")",
+      "Bash(ditto /Users/loganriedley/Developer/night-district/bar-ticket/exports/BarTicket.app/Contents '/Volumes/Bar Ticket/BarTicket.app/Contents')",
+      "Bash(mkdir \"/Volumes/Bar Ticket/BarTicket_tmp\")",
+      "Bash(ditto /Users/loganriedley/Developer/night-district/bar-ticket/exports/BarTicket.app/Contents '/Volumes/Bar Ticket/BarTicket_tmp/Contents')",
+      "Bash(mv \"/Volumes/Bar Ticket/BarTicket_tmp\" \"/Volumes/Bar Ticket/BarTicket.app\")",
+      "Bash(hdiutil info:*)",
+      "Bash(xattr -l /Users/loganriedley/Developer/night-district/bar-ticket/exports/BarTicket.app)",
+      "Bash(cp:*)",
+      "Bash(cp -R /Users/loganriedley/Developer/night-district/bar-ticket/exports/BarTicket.app /tmp/bt_stage/BarTicket_stage.app)",
+      "Bash(hdiutil convert:*)",
+      "Bash(hdiutil attach:*)",
+      "Bash(osascript -e 'tell application \"Finder\" to tell disk \"Bar Ticket\" to set name of item \"BarTicket_stage.app\" to \"BarTicket.app\"')",
+      "Bash(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" /Users/loganriedley/Developer/night-district/bar-ticket/exports/BarTicket.app/Contents/Info.plist)",
+      "Bash(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" /Users/loganriedley/Developer/night-district/bar-ticket/exports/BarTicket.app/Contents/Info.plist)",
+      "Bash(file /Users/loganriedley/Developer/night-district/bar-ticket/Icons/bar_ticket_icon.icon/*)",
+      "Bash(/tmp/bt-venv/bin/python3:*)"
     ]
   }
 }
