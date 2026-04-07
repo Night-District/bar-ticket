@@ -29,7 +29,9 @@ final class DynamicIslandController {
     private let viewModel = NotchViewModel()
     private var dismissTask: Task<Void, Never>?
     private var isVisible = false
-
+    
+    //TODO: design/github-icons (#59 https://github.com/Night-District/bar-ticket/issues/59)
+    // Download actual GitHub icon SVGs for projects, issues, branches, etc. and render them in the island instead of generic system icons.
     func show(state: IslandState) {
         dismissTask?.cancel()
         
