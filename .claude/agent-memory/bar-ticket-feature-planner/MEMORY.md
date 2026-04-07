@@ -1,0 +1,1 @@
+- [bar-ticket-site structure and deployment](project_bar-ticket-site-structure.md) — single index.html, 3 download-related buttons, GitHub Pages auto-deploy on push to main
