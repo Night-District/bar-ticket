@@ -70,7 +70,8 @@
       "Bash(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" /Users/loganriedley/Developer/night-district/bar-ticket/exports/BarTicket.app/Contents/Info.plist)",
       "Bash(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" /Users/loganriedley/Developer/night-district/bar-ticket/exports/BarTicket.app/Contents/Info.plist)",
       "Bash(file /Users/loganriedley/Developer/night-district/bar-ticket/Icons/bar_ticket_icon.icon/*)",
-      "Bash(/tmp/bt-venv/bin/python3:*)"
+      "Bash(/tmp/bt-venv/bin/python3:*)",
+      "Bash(python3 -m json.tool)"
     ]
   }
 }
