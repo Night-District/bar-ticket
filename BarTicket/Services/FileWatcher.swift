@@ -83,12 +83,18 @@ final class FileWatcher {
         }
     }
 
-    // Internal — only called from handleFileEvent, which already runs on queue.
-    private func updateIssuedTodo(_ record: IssuedTodoRecord) {
-        if let idx = issuedTodos.firstIndex(where: {
-            $0.issueNumber == record.issueNumber && $0.repoFullName == record.repoFullName
-        }) {
-            issuedTodos[idx] = record
+    /// Called after a successful PATCH — commits the new hash so subsequent saves
+    /// without further edits are no-ops rather than retrying the update.
+    func commitIssuedTodoUpdate(new: IssuedTodoRecord, oldHash: String) {
+        queue.async { [weak self] in
+            guard let self else { return }
+            seenHashes.remove(oldHash)
+            seenHashes.insert(new.contentHash)
+            if let idx = issuedTodos.firstIndex(where: {
+                $0.issueNumber == new.issueNumber && $0.repoFullName == new.repoFullName
+            }) {
+                issuedTodos[idx] = new
+            }
         }
     }
 
@@ -230,18 +236,11 @@ final class FileWatcher {
             onTodoDetected?(todo)
         }
 
-        // Notify for each updated TODO
+        // Notify for each updated TODO. State is NOT mutated here — seenHashes and
+        // issuedTodos are committed only after a successful PATCH via commitIssuedTodoUpdate,
+        // so a failed network call leaves the watcher able to retry on the next save.
         for updated in updatedTodos {
             print("[BarTicket] Updated TODO: \"\(updated.new.title)\" (issue #\(updated.old.issueNumber) on \(updated.old.repoFullName))")
-            seenHashes.insert(updated.new.contentHash)
-            seenHashes.remove(updated.old.contentHash)
-            updateIssuedTodo(IssuedTodoRecord(
-                issueNumber: updated.old.issueNumber,
-                repoFullName: updated.old.repoFullName,
-                contentHash: updated.new.contentHash,
-                issueURL: updated.old.issueURL,
-                title: updated.new.title
-            ))
             onTodoUpdated?(updated)
         }
     }

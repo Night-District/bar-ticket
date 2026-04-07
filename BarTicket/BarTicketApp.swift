@@ -316,6 +316,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     try? await Task.sleep(for: .seconds(1.0) - elapsed)
                 }
 
+                // Commit new hash to watcher so subsequent saves without further
+                // edits are no-ops rather than retrying the PATCH.
+                appState.fileWatcher?.commitIssuedTodoUpdate(
+                    new: IssuedTodoRecord(
+                        issueNumber: updated.old.issueNumber,
+                        repoFullName: updated.old.repoFullName,
+                        contentHash: updated.new.contentHash,
+                        issueURL: updated.old.issueURL,
+                        title: updated.new.title
+                    ),
+                    oldHash: updated.old.contentHash
+                )
+
                 // Update SeenTodo in SwiftData
                 let allTodos = (try? context.fetch(FetchDescriptor<SeenTodo>())) ?? []
                 if let existing = allTodos.first(where: {
