@@ -18,6 +18,8 @@ echo "Found: $APP_NAME.app"
 
 # ─── Paths ──────────────────────────────────────────────────────────────────
 STAGING_DIR="/tmp/bar-ticket-dmg-staging"
+STAGE_APP_NAME="${APP_NAME}_stage"    # avoids hdiutil .app verification restriction
+INITIAL_DMG="/tmp/BarTicket-initial.dmg"
 RW_DMG="/tmp/BarTicket-rw.dmg"
 FINAL_DMG="$SITE_DIR/assets/releases/BarTicket.dmg"
 VOLUME_NAME="Bar Ticket"
@@ -25,43 +27,56 @@ MOUNT_POINT="/Volumes/$VOLUME_NAME"
 
 # ─── Clean up from any previous failed run ──────────────────────────────────
 rm -rf "$STAGING_DIR"
-rm -f "$RW_DMG"
+rm -f "$INITIAL_DMG" "$RW_DMG"
 
 if [ -d "$MOUNT_POINT" ]; then
   hdiutil detach "$MOUNT_POINT" -quiet 2>/dev/null || true
 fi
 
-# ─── Build staging folder ───────────────────────────────────────────────────
-echo "Building staging folder..."
-mkdir -p "$STAGING_DIR/.background"
-
-cp -R "$APP" "$STAGING_DIR/$APP_NAME.app"
-ln -s /Applications "$STAGING_DIR/Applications"
-
+# ─── Verify background image exists ─────────────────────────────────────────
 if [ ! -f "$BACKGROUND_SRC" ]; then
   echo "Background image not found at $BACKGROUND_SRC"
   echo "Run: python3 $DEPLOY_DIR/generate-background.py"
   exit 1
 fi
-cp "$BACKGROUND_SRC" "$STAGING_DIR/.background/background.png"
 
-# ─── Create writable DMG from staging folder ────────────────────────────────
-echo "Creating writable DMG..."
-STAGING_SIZE_KB=$(du -sk "$STAGING_DIR" | cut -f1)
-DMG_SIZE_MB=$(( (STAGING_SIZE_KB / 1024) + 20 ))
+# ─── Build staging folder ───────────────────────────────────────────────────
+# Note: hdiutil blocks verification of *.app bundles by name. We stage the app
+# under a non-.app name and rename it via Finder (which has the required access)
+# after the initial DMG is created and mounted for editing.
+echo "Building staging folder..."
+mkdir -p "$STAGING_DIR"
+cp -R "$APP" "$STAGING_DIR/$STAGE_APP_NAME.app"
 
+# ─── Create initial compressed DMG from staged app ──────────────────────────
+echo "Creating initial DMG..."
 hdiutil create \
   -volname "$VOLUME_NAME" \
-  -srcfolder "$STAGING_DIR" \
+  -srcfolder "$STAGING_DIR/$STAGE_APP_NAME.app" \
   -ov \
-  -fs HFS+ \
-  -format UDRW \
-  -size "${DMG_SIZE_MB}m" \
-  "$RW_DMG"
+  -format UDZO \
+  "$INITIAL_DMG"
+
+rm -rf "$STAGING_DIR"
+
+# ─── Convert to writable DMG for editing ────────────────────────────────────
+echo "Converting to writable DMG..."
+hdiutil convert "$INITIAL_DMG" -format UDRW -o "$RW_DMG"
+rm -f "$INITIAL_DMG"
 
 # ─── Mount the writable DMG ─────────────────────────────────────────────────
-echo "Mounting writable DMG..."
+echo "Mounting..."
 hdiutil attach "$RW_DMG" -mountpoint "$MOUNT_POINT" -nobrowse -quiet
+
+# ─── Rename app to correct name via Finder ──────────────────────────────────
+echo "Renaming app bundle..."
+osascript -e "tell application \"Finder\" to tell disk \"$VOLUME_NAME\" to set name of item \"$STAGE_APP_NAME.app\" to \"$APP_NAME.app\""
+
+# ─── Add Applications symlink and background image ──────────────────────────
+echo "Adding installer assets..."
+ln -s /Applications "$MOUNT_POINT/Applications"
+mkdir -p "$MOUNT_POINT/.background"
+cp "$BACKGROUND_SRC" "$MOUNT_POINT/.background/background.png"
 
 sleep 2
 
@@ -83,11 +98,10 @@ tell application "Finder"
     set text size of viewOptions to 13
     set background picture of viewOptions to file ".background:background.png"
 
+    delay 1
+
     set position of item "$APP_NAME.app" of container window to {165, 175}
     set position of item "Applications" of container window to {495, 175}
-
-    close
-    open
 
     update without registering applications
     delay 2
@@ -102,14 +116,12 @@ sync
 hdiutil detach "$MOUNT_POINT" -quiet
 
 # ─── Convert to compressed read-only DMG ────────────────────────────────────
-echo "Converting to compressed DMG..."
+echo "Converting to final compressed DMG..."
 hdiutil convert "$RW_DMG" \
   -format UDZO \
   -imagekey zlib-level=9 \
   -o "$FINAL_DMG"
 
-# ─── Clean up temp files ────────────────────────────────────────────────────
-rm -rf "$STAGING_DIR"
 rm -f "$RW_DMG"
 
 DMG_SIZE=$(du -sh "$FINAL_DMG" | cut -f1)
