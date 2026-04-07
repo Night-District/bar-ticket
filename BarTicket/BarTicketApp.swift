@@ -47,9 +47,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         bootstrap()
     }
 
-    //TODO: fix/error (#71 https://github.com/Night-District/bar-ticket/issues/71)
-    // Implement robust error handling for critical failures to prevent silent failures and crashes. Show user-friendly error messages Dynamic Island when appropriate. Hey man this is working.
-    // This looks great
     private func bootstrap() {
         let context = modelContainer.mainContext
 
