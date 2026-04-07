@@ -65,8 +65,8 @@ final class DynamicIslandController {
             viewModel.isV2Project = false
 
         case .updating(let title):
-            viewModel.icon = "arrow.trianglehead.2.counterclockwise"
-            viewModel.iconColor = .orange
+            viewModel.icon = "arrow.trianglehead.clockwise"
+            viewModel.iconColor = .cyan
             viewModel.iconAnimation = .rotating
             viewModel.title = "Updating issue..."
             viewModel.subtitle = title
