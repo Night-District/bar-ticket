@@ -3,12 +3,14 @@ import Alamofire
 
 struct GitHubIssueResponse: Decodable {
     let id: Int
+    let nodeId: String
     let number: Int
     let htmlUrl: String
     let title: String
 
     enum CodingKeys: String, CodingKey {
         case id, number, title
+        case nodeId = "node_id"
         case htmlUrl = "html_url"
     }
 }
