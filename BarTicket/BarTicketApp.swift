@@ -27,7 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let appState = AppState()
     
     //TODO: feat/add-schema (#54 https://github.com/Night-District/bar-ticket/issues/54)
-    // Add schemas to support database migrations 
+    // Add schemas to support database migrations preventing crashes
     let modelContainer: ModelContainer = {
         let schema = Schema([
             AppSettings.self,
@@ -88,10 +88,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let watcher = FileWatcher()
         appState.fileWatcher = watcher
 
-        // Load seen hashes
+        // Load seen hashes and issued todo records
         let seenDescriptor = FetchDescriptor<SeenTodo>()
         if let seenTodos = try? context.fetch(seenDescriptor) {
             watcher.loadSeenHashes(Set(seenTodos.map(\.contentHash)))
+            let issuedRecords = seenTodos.compactMap { todo -> IssuedTodoRecord? in
+                guard let issueNumber = todo.issueNumber,
+                      let repoFullName = todo.repoFullName else { return nil }
+                return IssuedTodoRecord(
+                    issueNumber: issueNumber,
+                    repoFullName: repoFullName,
+                    contentHash: todo.contentHash,
+                    issueURL: todo.issueURL,
+                    title: todo.title
+                )
+            }
+            watcher.loadIssuedTodos(issuedRecords)
         }
 
         // Handle new TODOs
@@ -99,6 +111,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             print("[BarTicket] TODO detected: \"\(todo.title)\" in \(todo.filePath):\(todo.lineNumber)")
             DispatchQueue.main.async {
                 self?.handleNewTodo(todo, context: context)
+            }
+        }
+
+        // Handle updated TODOs (existing issue, body changed)
+        watcher.onTodoUpdated = { [weak self] updated in
+            print("[BarTicket] TODO updated: \"\(updated.new.title)\" issue #\(updated.old.issueNumber) on \(updated.old.repoFullName)")
+            DispatchQueue.main.async {
+                self?.handleUpdatedTodo(updated, context: context)
             }
         }
 
@@ -187,6 +207,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 context.insert(seenTodo)
                 try? context.save()
 
+                // Register with watcher so future edits trigger an update instead of a new issue
+                appState.fileWatcher?.addIssuedTodo(IssuedTodoRecord(
+                    issueNumber: response.number,
+                    repoFullName: repoInfo.fullName,
+                    contentHash: todo.contentHash,
+                    issueURL: response.htmlUrl,
+                    title: todo.title
+                ))
+
                 // Track in recent issues
                 let created = CreatedIssue(
                     title: todo.title,
@@ -244,6 +273,87 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             } catch {
                 appState.showIsland(state: .error(message: error.localizedDescription))
                 print("[BarTicket] Error creating issue: \(error)")
+            }
+        }
+    }
+
+    @MainActor
+    private func handleUpdatedTodo(_ updated: UpdatedTodo, context: ModelContext) {
+        guard appState.isWatchingEnabled else { return }
+        guard let token = appState.githubToken else {
+            appState.showIsland(state: .error(message: "No GitHub token configured"))
+            return
+        }
+
+        let parts = updated.old.repoFullName.split(separator: "/", maxSplits: 1)
+        guard parts.count == 2 else {
+            appState.showIsland(state: .error(message: "Invalid repo: \(updated.old.repoFullName)"))
+            return
+        }
+        let owner = String(parts[0])
+        let repo = String(parts[1])
+
+        appState.showIsland(state: .detecting(title: updated.new.title))
+
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(1.0))
+
+            appState.showIsland(state: .updating(title: updated.new.title))
+            let updatingShownAt = ContinuousClock.now
+
+            do {
+                _ = try await GitHubClient.updateIssue(
+                    owner: owner,
+                    repo: repo,
+                    number: updated.old.issueNumber,
+                    title: updated.new.title,
+                    body: updated.new.issueBody,
+                    token: token
+                )
+
+                let elapsed = ContinuousClock.now - updatingShownAt
+                if elapsed < .seconds(1.0) {
+                    try? await Task.sleep(for: .seconds(1.0) - elapsed)
+                }
+
+                // Commit new hash to watcher so subsequent saves without further
+                // edits are no-ops rather than retrying the PATCH.
+                appState.fileWatcher?.commitIssuedTodoUpdate(
+                    new: IssuedTodoRecord(
+                        issueNumber: updated.old.issueNumber,
+                        repoFullName: updated.old.repoFullName,
+                        contentHash: updated.new.contentHash,
+                        issueURL: updated.old.issueURL,
+                        title: updated.new.title
+                    ),
+                    oldHash: updated.old.contentHash
+                )
+
+                // Update SeenTodo in SwiftData
+                let allTodos = (try? context.fetch(FetchDescriptor<SeenTodo>())) ?? []
+                if let existing = allTodos.first(where: {
+                    $0.issueNumber == updated.old.issueNumber && $0.repoFullName == updated.old.repoFullName
+                }) {
+                    existing.contentHash = updated.new.contentHash
+                    existing.title = updated.new.title
+                    try? context.save()
+                }
+
+                appState.showIsland(state: .confirmed(
+                    title: updated.new.title,
+                    repoFullName: updated.old.repoFullName,
+                    issueNumber: updated.old.issueNumber,
+                    issueURL: updated.old.issueURL ?? "",
+                    projectName: nil,
+                    projectURL: nil,
+                    projectFailed: false,
+                    isV2Project: false
+                ))
+
+                print("[BarTicket] Issue updated: #\(updated.old.issueNumber) on \(updated.old.repoFullName)")
+            } catch {
+                appState.showIsland(state: .error(message: error.localizedDescription))
+                print("[BarTicket] Error updating issue: \(error)")
             }
         }
     }

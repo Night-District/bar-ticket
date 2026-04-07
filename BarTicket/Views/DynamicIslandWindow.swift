@@ -64,6 +64,18 @@ final class DynamicIslandController {
             viewModel.projectFailed = false
             viewModel.isV2Project = false
 
+        case .updating(let title):
+            viewModel.icon = "arrow.trianglehead.clockwise"
+            viewModel.iconColor = .cyan
+            viewModel.iconAnimation = .rotating
+            viewModel.title = "Updating issue..."
+            viewModel.subtitle = title
+            viewModel.issueURL = nil
+            viewModel.projectName = nil
+            viewModel.projectURL = nil
+            viewModel.projectFailed = false
+            viewModel.isV2Project = false
+
         case .confirmed(_, let repoFullName, let issueNumber, let issueURL, let projectName, let projectURL, let projectFailed, let isV2):
             viewModel.icon = "checkmark.circle.fill"
             viewModel.iconColor = .green

@@ -8,10 +8,14 @@ final class FileWatcher {
     private let queue = DispatchQueue(label: "com.nightdistrict.bar-ticket.filewatcher", qos: .utility)
     private var fileCache: [String: String] = [:] // filePath → lastKnownContent
     private var seenHashes: Set<String> = []
+    private var issuedTodos: [IssuedTodoRecord] = []
     private var isRunning = false
 
     /// Called when a new TODO is detected
     var onTodoDetected: ((ParsedTodo) -> Void)?
+
+    /// Called when an existing TODO's content changes (identified by embedded #N reference)
+    var onTodoUpdated: ((UpdatedTodo) -> Void)?
 
     // MARK: - Lifecycle
 
@@ -50,12 +54,48 @@ final class FileWatcher {
         isRunning = false
     }
 
+    // All public mutation methods dispatch to `queue` so that reads/writes to
+    // seenHashes, issuedTodos, and fileCache are always serialized on the same
+    // executor as handleFileEvent. Callers (typically the main actor) must not
+    // access these collections directly.
+
     func loadSeenHashes(_ hashes: Set<String>) {
-        seenHashes = hashes
+        queue.async { [weak self] in
+            self?.seenHashes = hashes
+        }
     }
 
     func addSeenHash(_ hash: String) {
-        seenHashes.insert(hash)
+        queue.async { [weak self] in
+            self?.seenHashes.insert(hash)
+        }
+    }
+
+    func loadIssuedTodos(_ records: [IssuedTodoRecord]) {
+        queue.async { [weak self] in
+            self?.issuedTodos = records
+        }
+    }
+
+    func addIssuedTodo(_ record: IssuedTodoRecord) {
+        queue.async { [weak self] in
+            self?.issuedTodos.append(record)
+        }
+    }
+
+    /// Called after a successful PATCH — commits the new hash so subsequent saves
+    /// without further edits are no-ops rather than retrying the update.
+    func commitIssuedTodoUpdate(new: IssuedTodoRecord, oldHash: String) {
+        queue.async { [weak self] in
+            guard let self else { return }
+            seenHashes.remove(oldHash)
+            seenHashes.insert(new.contentHash)
+            if let idx = issuedTodos.firstIndex(where: {
+                $0.issueNumber == new.issueNumber && $0.repoFullName == new.repoFullName
+            }) {
+                issuedTodos[idx] = new
+            }
+        }
     }
 
     /// Update the cached content for a file to prevent re-triggering on our own edits
@@ -170,22 +210,38 @@ final class FileWatcher {
             seenHashes: seenHashes
         )
 
+        // Find updated TODOs (existing issues whose text changed)
+        let updatedTodos = TodoParser.findUpdatedTodos(
+            currentContent: currentContent,
+            filePath: path,
+            issuedTodos: issuedTodos
+        )
+
         // Update cache
         fileCache[path] = currentContent
 
-        if newTodos.isEmpty {
-            print("[BarTicket] No new TODOs (all \(allCurrentTodos.count) already seen or in previous cache)")
-        } else {
-            print("[BarTicket] Found \(newTodos.count) new TODO(s) in \(path)")
-            for todo in newTodos {
-                print("[BarTicket]   -> \"\(todo.title)\" (hash: \(todo.contentHash.prefix(12))...)")
-            }
+        // Exclude from new TODOs anything already handled as an update — same edit,
+        // different hash, would otherwise fire both pipelines.
+        let updatedNewHashes = Set(updatedTodos.map(\.new.contentHash))
+        let trueNewTodos = newTodos.filter { !updatedNewHashes.contains($0.contentHash) }
+
+        if trueNewTodos.isEmpty && updatedTodos.isEmpty {
+            print("[BarTicket] No new or updated TODOs (all \(allCurrentTodos.count) already seen or in previous cache)")
         }
 
         // Notify for each new TODO
-        for todo in newTodos {
+        for todo in trueNewTodos {
+            print("[BarTicket] New TODO: \"\(todo.title)\" (hash: \(todo.contentHash.prefix(12))...)")
             seenHashes.insert(todo.contentHash)
             onTodoDetected?(todo)
+        }
+
+        // Notify for each updated TODO. State is NOT mutated here — seenHashes and
+        // issuedTodos are committed only after a successful PATCH via commitIssuedTodoUpdate,
+        // so a failed network call leaves the watcher able to retry on the next save.
+        for updated in updatedTodos {
+            print("[BarTicket] Updated TODO: \"\(updated.new.title)\" (issue #\(updated.old.issueNumber) on \(updated.old.repoFullName))")
+            onTodoUpdated?(updated)
         }
     }
 }

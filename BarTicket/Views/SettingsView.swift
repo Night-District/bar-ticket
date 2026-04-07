@@ -39,8 +39,6 @@ struct SettingsView: View {
 
             Divider()
 
-            //TODO: change/refactor (#62 https://github.com/Night-District/bar-ticket/issues/62)
-            // The main content area with settings
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     // GitHub Token
