@@ -83,4 +83,47 @@ enum GitHubClient {
             throw afError
         }
     }
+
+    static func updateIssue(
+        owner: String,
+        repo: String,
+        number: Int,
+        title: String,
+        body: String,
+        token: String
+    ) async throws -> GitHubIssueResponse {
+        let url = "\(Constants.githubAPIURL)/repos/\(owner)/\(repo)/issues/\(number)"
+
+        let parameters: [String: Any] = [
+            "title": title,
+            "body": body
+        ]
+
+        let response = AF.request(
+            url,
+            method: .patch,
+            parameters: parameters,
+            encoding: JSONEncoding.default,
+            headers: headers(token: token)
+        )
+        .validate(statusCode: 200..<300)
+
+        do {
+            return try await response
+                .serializingDecodable(GitHubIssueResponse.self)
+                .value
+        } catch let afError as AFError {
+            if let statusCode = afError.responseCode {
+                switch statusCode {
+                case 403:
+                    throw GitHubClientError.rateLimited
+                case 404:
+                    throw GitHubClientError.repoNotFound("\(owner)/\(repo)")
+                default:
+                    throw afError
+                }
+            }
+            throw afError
+        }
+    }
 }

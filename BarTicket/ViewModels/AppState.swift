@@ -5,6 +5,7 @@ enum IslandState: Equatable {
     case hidden
     case detecting(title: String)
     case creating(title: String)
+    case updating(title: String)
     case confirmed(
         title: String,
         repoFullName: String,
