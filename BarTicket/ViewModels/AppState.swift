@@ -32,25 +32,45 @@ struct CreatedIssue: Identifiable {
 final class AppState {
     var isWatchingEnabled = true
     var githubToken: String?
+    var githubUser: GitHubUser?
     var islandState: IslandState = .hidden
     var recentIssues: [CreatedIssue] = []
 
     // Services
     var fileWatcher: FileWatcher?
     var islandController: DynamicIslandController?
+    let authService = GitHubAuthService()
 
-    func loadToken() {
-        githubToken = KeychainService.read(key: .githubToken)
+    var isAuthenticated: Bool { githubToken != nil }
+
+    func loadAuth() {
+        // Prefer OAuth token; fall back to legacy PAT and migrate
+        if let oauthToken = KeychainService.read(key: .githubOAuthToken) {
+            githubToken = oauthToken
+        } else if let legacyToken = KeychainService.read(key: .githubToken) {
+            // Migrate PAT to OAuth key
+            try? KeychainService.save(key: .githubOAuthToken, value: legacyToken)
+            KeychainService.delete(key: .githubToken)
+            githubToken = legacyToken
+        }
     }
 
-    func saveToken(_ token: String) throws {
-        try KeychainService.save(key: .githubToken, value: token)
+    func saveAuth(token: String, user: GitHubUser) throws {
+        try KeychainService.save(key: .githubOAuthToken, value: token)
         githubToken = token
+        githubUser = user
     }
 
-    func clearToken() {
+    func fetchUserIfNeeded() async {
+        guard let token = githubToken, githubUser == nil else { return }
+        githubUser = try? await authService.fetchAuthenticatedUser(token: token)
+    }
+
+    func signOut() {
+        KeychainService.delete(key: .githubOAuthToken)
         KeychainService.delete(key: .githubToken)
         githubToken = nil
+        githubUser = nil
     }
 
     func addRecentIssue(_ issue: CreatedIssue) {
