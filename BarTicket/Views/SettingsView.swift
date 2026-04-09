@@ -40,55 +40,59 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     // GitHub Account
                     GroupBox {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label("GitHub Account", systemImage: "person.fill")
-                                .font(.caption.bold())
+                        HStack {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("GitHub Account", systemImage: "person.fill")
+                                    .font(.caption.bold())
 
-                            HStack(spacing: 10) {
-                                if let avatarURL = appState.githubUser.flatMap({ URL(string: $0.avatarUrl) }) {
-                                    AsyncImage(url: avatarURL) { image in
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                    } placeholder: {
-                                        Circle().fill(.secondary.opacity(0.2))
-                                    }
-                                    .frame(width: 32, height: 32)
-                                    .clipShape(Circle())
-                                } else {
-                                    Circle()
-                                        .fill(.secondary.opacity(0.2))
-                                        .frame(width: 32, height: 32)
-                                }
-
-                                VStack(alignment: .leading, spacing: 2) {
-                                    if let user = appState.githubUser {
-                                        Text("@\(user.login)")
-                                            .font(.caption.bold())
-                                        if let name = user.name {
-                                            Text(name)
-                                                .font(.caption2)
-                                                .foregroundStyle(.secondary)
+                                HStack(spacing: 10) {
+                                    if let avatarURL = appState.githubUser.flatMap({ URL(string: $0.avatarUrl) }) {
+                                        AsyncImage(url: avatarURL) { image in
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                        } placeholder: {
+                                            Circle().fill(.secondary.opacity(0.2))
                                         }
+                                        .frame(width: 32, height: 32)
+                                        .clipShape(Circle())
                                     } else {
-                                        Text("Connected")
-                                            .font(.caption.bold())
+                                        Circle()
+                                            .fill(.secondary.opacity(0.2))
+                                            .frame(width: 32, height: 32)
                                     }
-                                    Text("Connected via GitHub OAuth")
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                }
 
-                                Spacer()
-
-                                Button("Sign Out") {
-                                    appState.signOut()
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        if let user = appState.githubUser {
+                                            Text("@\(user.login)")
+                                                .font(.caption.bold())
+                                            if let name = user.name {
+                                                Text(name)
+                                                    .font(.caption2)
+                                                    .foregroundStyle(.secondary)
+                                            }
+                                        } else {
+                                            Text("Connected")
+                                                .font(.caption.bold())
+                                        }
+                                        Text("Connected via GitHub OAuth")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
-                                .font(.caption)
-                                .foregroundStyle(.red)
                             }
+                            .padding(.vertical, 2)
+                            
+                            
+                            Spacer()
+
+                            Button("Sign Out") {
+                                appState.signOut()
+                            }
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                            .padding()
                         }
-                        .padding(.vertical, 2)
                     }
                     
                     // Watched Directories
@@ -195,7 +199,7 @@ struct SettingsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 Spacer()
-                Text("v2.0.0")
+                Text("v1.0.0")
                     .font(.caption2)
                     .foregroundStyle(.quaternary)
             }

@@ -49,7 +49,7 @@ struct OnboardingView: View {
                             .multilineTextAlignment(.center)
                     }
                 }
-                .padding(.horizontal, 32)
+                .padding(.horizontal)
             }
 
             Spacer()

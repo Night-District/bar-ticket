@@ -8,9 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		059DA0807579DB4A87095C9B /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F451F7E719B10F1621256F0A /* AppSettings.swift */; };
-		AA01BB02CC03DD04EE05FF06 /* GitHubUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB12CC13DD14EE15FF16 /* GitHubUser.swift */; };
-		BA01CB02DC03ED04FE05AF06 /* GitHubAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA11CB12DC13ED14FE15AF16 /* GitHubAuthService.swift */; };
-		CA01DB02EC03FD04AE05BF06 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA11DB12EC13FD14AE15BF16 /* OnboardingView.swift */; };
 		28E9A422848D3D302A0D03E7 /* FileWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E008ACE6FA2659DE4A51EBE /* FileWatcher.swift */; };
 		3F68F380495D45FA16C297DC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8AC6143CA7BF64B2BAF007 /* SettingsView.swift */; };
 		540CF3013DBBBBF326F1C9AC /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E90F4B01A5C198FE0307701 /* AppState.swift */; };
@@ -23,7 +20,10 @@
 		8F1CF8926781F917A3D4030C /* DynamicNotchKit in Frameworks */ = {isa = PBXBuildFile; productRef = E4A46A355B6FA5E5A09814F3 /* DynamicNotchKit */; };
 		A1512A73640C9D588F6FA140 /* GitHubProjectsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F29F001926B68BA31797C6F /* GitHubProjectsClient.swift */; };
 		A1B2C3D4E5F6A7B800000002 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7CD057752F863F06009D7363 /* Assets.xcassets */; };
+		AA01BB02CC03DD04EE05FF06 /* GitHubUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB12CC13DD14EE15FF16 /* GitHubUser.swift */; };
 		AFFDD0F66E4E6E811EEDE4A8 /* ProjectCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12C96699CD1DE993D65E76A /* ProjectCache.swift */; };
+		BA01CB02DC03ED04FE05AF06 /* GitHubAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA11CB12DC13ED14FE15AF16 /* GitHubAuthService.swift */; };
+		CA01DB02EC03FD04AE05BF06 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA11DB12EC13FD14AE15BF16 /* OnboardingView.swift */; };
 		D28CDF2D71D68A356EEAF58C /* GitHubClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E23A849A4DDD594F868BA63 /* GitHubClient.swift */; };
 		DE79B8E7FD665531D97AD38C /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403057D30BB6BE30CEF8E201 /* KeychainService.swift */; };
 		E2853D30DEBE8070CE60962D /* GitResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C9A318AC41F205C94733E /* GitResolver.swift */; };
@@ -33,9 +33,6 @@
 
 /* Begin PBXFileReference section */
 		1F29F001926B68BA31797C6F /* GitHubProjectsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubProjectsClient.swift; sourceTree = "<group>"; };
-		AA11BB12CC13DD14EE15FF16 /* GitHubUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubUser.swift; sourceTree = "<group>"; };
-		BA11CB12DC13ED14FE15AF16 /* GitHubAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubAuthService.swift; sourceTree = "<group>"; };
-		CA11DB12EC13FD14AE15BF16 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		2B4950D3ED46181FBBB88678 /* TodoParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoParser.swift; sourceTree = "<group>"; };
 		35B40BFAA21B9D32DB623031 /* BarTicket.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BarTicket.entitlements; sourceTree = "<group>"; };
 		403057D30BB6BE30CEF8E201 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
@@ -46,7 +43,10 @@
 		7CD0577A2F872E72009D7363 /* bar_ticket_icon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = bar_ticket_icon.icon; sourceTree = "<group>"; };
 		7F577904FD1BA62C74B9F423 /* BarTicket.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BarTicket.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E008ACE6FA2659DE4A51EBE /* FileWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWatcher.swift; sourceTree = "<group>"; };
+		AA11BB12CC13DD14EE15FF16 /* GitHubUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubUser.swift; sourceTree = "<group>"; };
 		B12C96699CD1DE993D65E76A /* ProjectCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectCache.swift; sourceTree = "<group>"; };
+		BA11CB12DC13ED14FE15AF16 /* GitHubAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubAuthService.swift; sourceTree = "<group>"; };
+		CA11DB12EC13FD14AE15BF16 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		CF8AC6143CA7BF64B2BAF007 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		D521C60A90EFB5E998568CC8 /* WatchedDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchedDirectory.swift; sourceTree = "<group>"; };
 		DECD5A1F7EF0D6CCF93CEB93 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -258,9 +258,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = bar_ticket_icon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = BarTicket/BarTicket.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = XK767LS9B3;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -412,9 +414,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = bar_ticket_icon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = BarTicket/BarTicket.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = XK767LS9B3;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
