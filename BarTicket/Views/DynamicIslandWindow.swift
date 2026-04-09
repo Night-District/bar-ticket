@@ -144,8 +144,6 @@ final class DynamicIslandController {
     }
 }
 
-//TODO: refactor/NotchExpandedView (#80 https://github.com/Night-District/bar-ticket/issues/80)
-// Refactor the NotchExpandedView to be more modular and reusable. For example, create separate subviews for the icon, text, and project badge sections. This will make it easier to maintain and extend in the future as we add more features or different types of notifications.
 struct NotchExpandedView: View {
     @Bindable var viewModel: NotchViewModel
 
@@ -178,9 +176,7 @@ struct NotchExpandedView: View {
                     )
                 }
             }
-
-            //TODO: i dont like this (#81 https://github.com/Night-District/bar-ticket/issues/81)
-            // Remove this hacky spacer once we have a better layout solution for the island content. Right now it just pushes the Open button to the right edge, but ideally we'd want a more flexible layout that can adapt to different content lengths and screen sizes without needing invisible spacers.
+            
             Spacer(minLength: 0)
 
             if let urlString = viewModel.issueURL,
