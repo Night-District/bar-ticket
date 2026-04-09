@@ -176,7 +176,7 @@ struct NotchExpandedView: View {
                     )
                 }
             }
-
+            
             Spacer(minLength: 0)
 
             if let urlString = viewModel.issueURL,

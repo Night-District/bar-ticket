@@ -14,11 +14,16 @@
 		5C52FC8A2F68AE2B24A99488 /* BarTicketApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F507DC7CA0D9F143237B4B34 /* BarTicketApp.swift */; };
 		5D81B13A6426FC6601AC2C44 /* WatchedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D521C60A90EFB5E998568CC8 /* WatchedDirectory.swift */; };
 		5E4540AC983CF012FDBFF754 /* TodoParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4950D3ED46181FBBB88678 /* TodoParser.swift */; };
+		7CD0577B2F872E72009D7363 /* bar_ticket_icon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7CD0577A2F872E72009D7363 /* bar_ticket_icon.icon */; };
 		804A431941E07C7DCAB3072D /* SeenTodo.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED211344F252E3986FB5AF04 /* SeenTodo.swift */; };
 		8EF7386AA86B07DC22B7DD70 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9737CE62F300FA96DAFD1C4F /* Alamofire */; };
 		8F1CF8926781F917A3D4030C /* DynamicNotchKit in Frameworks */ = {isa = PBXBuildFile; productRef = E4A46A355B6FA5E5A09814F3 /* DynamicNotchKit */; };
 		A1512A73640C9D588F6FA140 /* GitHubProjectsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F29F001926B68BA31797C6F /* GitHubProjectsClient.swift */; };
+		A1B2C3D4E5F6A7B800000002 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7CD057752F863F06009D7363 /* Assets.xcassets */; };
+		AA01BB02CC03DD04EE05FF06 /* GitHubUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB12CC13DD14EE15FF16 /* GitHubUser.swift */; };
 		AFFDD0F66E4E6E811EEDE4A8 /* ProjectCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12C96699CD1DE993D65E76A /* ProjectCache.swift */; };
+		BA01CB02DC03ED04FE05AF06 /* GitHubAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA11CB12DC13ED14FE15AF16 /* GitHubAuthService.swift */; };
+		CA01DB02EC03FD04AE05BF06 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA11DB12EC13FD14AE15BF16 /* OnboardingView.swift */; };
 		D28CDF2D71D68A356EEAF58C /* GitHubClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E23A849A4DDD594F868BA63 /* GitHubClient.swift */; };
 		DE79B8E7FD665531D97AD38C /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 403057D30BB6BE30CEF8E201 /* KeychainService.swift */; };
 		E2853D30DEBE8070CE60962D /* GitResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672C9A318AC41F205C94733E /* GitResolver.swift */; };
@@ -34,9 +39,14 @@
 		4E90F4B01A5C198FE0307701 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		672C9A318AC41F205C94733E /* GitResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitResolver.swift; sourceTree = "<group>"; };
 		6E23A849A4DDD594F868BA63 /* GitHubClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubClient.swift; sourceTree = "<group>"; };
+		7CD057752F863F06009D7363 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7CD0577A2F872E72009D7363 /* bar_ticket_icon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = bar_ticket_icon.icon; sourceTree = "<group>"; };
 		7F577904FD1BA62C74B9F423 /* BarTicket.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BarTicket.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E008ACE6FA2659DE4A51EBE /* FileWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWatcher.swift; sourceTree = "<group>"; };
+		AA11BB12CC13DD14EE15FF16 /* GitHubUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubUser.swift; sourceTree = "<group>"; };
 		B12C96699CD1DE993D65E76A /* ProjectCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectCache.swift; sourceTree = "<group>"; };
+		BA11CB12DC13ED14FE15AF16 /* GitHubAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubAuthService.swift; sourceTree = "<group>"; };
+		CA11DB12EC13FD14AE15BF16 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		CF8AC6143CA7BF64B2BAF007 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		D521C60A90EFB5E998568CC8 /* WatchedDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchedDirectory.swift; sourceTree = "<group>"; };
 		DECD5A1F7EF0D6CCF93CEB93 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -63,6 +73,7 @@
 		1DC8896ABBFC5D35DEB1FC91 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				BA11CB12DC13ED14FE15AF16 /* GitHubAuthService.swift */,
 				8E008ACE6FA2659DE4A51EBE /* FileWatcher.swift */,
 				6E23A849A4DDD594F868BA63 /* GitHubClient.swift */,
 				1F29F001926B68BA31797C6F /* GitHubProjectsClient.swift */,
@@ -85,6 +96,7 @@
 			isa = PBXGroup;
 			children = (
 				F451F7E719B10F1621256F0A /* AppSettings.swift */,
+				AA11BB12CC13DD14EE15FF16 /* GitHubUser.swift */,
 				B12C96699CD1DE993D65E76A /* ProjectCache.swift */,
 				ED211344F252E3986FB5AF04 /* SeenTodo.swift */,
 				D521C60A90EFB5E998568CC8 /* WatchedDirectory.swift */,
@@ -97,6 +109,7 @@
 			children = (
 				35B40BFAA21B9D32DB623031 /* BarTicket.entitlements */,
 				F507DC7CA0D9F143237B4B34 /* BarTicketApp.swift */,
+				7CD057752F863F06009D7363 /* Assets.xcassets */,
 				F429A7C9C85509193C294206 /* Info.plist */,
 				54A0133A339749BB0A322606 /* Models */,
 				1DC8896ABBFC5D35DEB1FC91 /* Services */,
@@ -119,6 +132,7 @@
 			isa = PBXGroup;
 			children = (
 				F86C415F6801E38E222016DA /* DynamicIslandWindow.swift */,
+				CA11DB12EC13FD14AE15BF16 /* OnboardingView.swift */,
 				CF8AC6143CA7BF64B2BAF007 /* SettingsView.swift */,
 			);
 			path = Views;
@@ -129,6 +143,7 @@
 			children = (
 				780984CE20BCB862A4C328C0 /* BarTicket */,
 				510EF9B748A97B2AD3CC0C4F /* Products */,
+				7CD0577A2F872E72009D7363 /* bar_ticket_icon.icon */,
 			);
 			sourceTree = "<group>";
 		};
@@ -149,6 +164,7 @@
 			buildPhases = (
 				29DA5E7B62A16D60F8117C3B /* Sources */,
 				FA3148BFA8F5582B1D02C5C9 /* Frameworks */,
+				A1B2C3D4E5F6A7B800000003 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -170,7 +186,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 2630;
 			};
 			buildConfigurationList = 801D09E56011760D88BF4018 /* Build configuration list for PBXProject "BarTicket" */;
 			developmentRegion = en;
@@ -195,6 +211,18 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		A1B2C3D4E5F6A7B800000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B2C3D4E5F6A7B800000002 /* Assets.xcassets in Resources */,
+				7CD0577B2F872E72009D7363 /* bar_ticket_icon.icon in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		29DA5E7B62A16D60F8117C3B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -206,12 +234,15 @@
 				F610043466E0E1C7807AFD68 /* Constants.swift in Sources */,
 				F12E6D92B7591973EF6384F1 /* DynamicIslandWindow.swift in Sources */,
 				28E9A422848D3D302A0D03E7 /* FileWatcher.swift in Sources */,
+				BA01CB02DC03ED04FE05AF06 /* GitHubAuthService.swift in Sources */,
 				D28CDF2D71D68A356EEAF58C /* GitHubClient.swift in Sources */,
 				A1512A73640C9D588F6FA140 /* GitHubProjectsClient.swift in Sources */,
 				E2853D30DEBE8070CE60962D /* GitResolver.swift in Sources */,
 				DE79B8E7FD665531D97AD38C /* KeychainService.swift in Sources */,
 				AFFDD0F66E4E6E811EEDE4A8 /* ProjectCache.swift in Sources */,
 				804A431941E07C7DCAB3072D /* SeenTodo.swift in Sources */,
+				AA01BB02CC03DD04EE05FF06 /* GitHubUser.swift in Sources */,
+				CA01DB02EC03FD04AE05BF06 /* OnboardingView.swift in Sources */,
 				3F68F380495D45FA16C297DC /* SettingsView.swift in Sources */,
 				5E4540AC983CF012FDBFF754 /* TodoParser.swift in Sources */,
 				5D81B13A6426FC6601AC2C44 /* WatchedDirectory.swift in Sources */,
@@ -225,13 +256,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = bar_ticket_icon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = BarTicket/BarTicket.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = XK767LS9B3;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BarTicket/Info.plist;
@@ -254,6 +288,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -284,9 +319,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -307,9 +344,10 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 5.10;
 			};
 			name = Debug;
 		};
@@ -317,6 +355,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -347,9 +386,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -363,9 +404,10 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 5.10;
 			};
 			name = Release;
 		};
@@ -373,13 +415,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = bar_ticket_icon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = BarTicket/BarTicket.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = XK767LS9B3;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BarTicket/Info.plist;

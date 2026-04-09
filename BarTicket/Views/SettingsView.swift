@@ -9,9 +9,6 @@ struct SettingsView: View {
     @Query(sort: \SeenTodo.createdAt, order: .reverse) private var seenTodos: [SeenTodo]
     @Query private var cachedProjects: [ProjectCache]
 
-    @State private var tokenInput = ""
-    @State private var showTokenField = false
-
     private var appSettings: AppSettings? { settings.first }
 
     var body: some View {
@@ -38,45 +35,64 @@ struct SettingsView: View {
             .padding()
 
             Divider()
-
+            
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    // GitHub Token
+                    // GitHub Account
                     GroupBox {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label("GitHub Token", systemImage: "key.fill")
-                                .font(.caption.bold())
+                        HStack {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("GitHub Account", systemImage: "person.fill")
+                                    .font(.caption.bold())
 
-                            if appState.githubToken != nil && !showTokenField {
-                                HStack {
-                                    Text("ghp_" + String(repeating: "\u{2022}", count: 16))
-                                        .font(.system(.caption, design: .monospaced))
-                                        .foregroundStyle(.secondary)
-                                    Spacer()
-                                    Button("Change") {
-                                        showTokenField = true
-                                        tokenInput = ""
+                                HStack(spacing: 10) {
+                                    if let avatarURL = appState.githubUser.flatMap({ URL(string: $0.avatarUrl) }) {
+                                        AsyncImage(url: avatarURL) { image in
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                        } placeholder: {
+                                            Circle().fill(.secondary.opacity(0.2))
+                                        }
+                                        .frame(width: 32, height: 32)
+                                        .clipShape(Circle())
+                                    } else {
+                                        Circle()
+                                            .fill(.secondary.opacity(0.2))
+                                            .frame(width: 32, height: 32)
                                     }
-                                    .font(.caption)
-                                }
-                            } else {
-                                HStack(spacing: 8) {
-                                    SecureField("ghp_...", text: $tokenInput)
-                                        .textFieldStyle(.roundedBorder)
-                                        .font(.system(.caption, design: .monospaced))
 
-                                    Button("Save") {
-                                        let trimmed = tokenInput.trimmingCharacters(in: .whitespaces)
-                                        guard !trimmed.isEmpty else { return }
-                                        try? appState.saveToken(trimmed)
-                                        tokenInput = ""
-                                        showTokenField = false
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        if let user = appState.githubUser {
+                                            Text("@\(user.login)")
+                                                .font(.caption.bold())
+                                            if let name = user.name {
+                                                Text(name)
+                                                    .font(.caption2)
+                                                    .foregroundStyle(.secondary)
+                                            }
+                                        } else {
+                                            Text("Connected")
+                                                .font(.caption.bold())
+                                        }
+                                        Text("Connected via GitHub OAuth")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
                                     }
-                                    .disabled(tokenInput.trimmingCharacters(in: .whitespaces).isEmpty)
                                 }
                             }
+                            .padding(.vertical, 2)
+                            
+                            
+                            Spacer()
+
+                            Button("Sign Out") {
+                                appState.signOut()
+                            }
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                            .padding()
                         }
-                        .padding(.vertical, 2)
                     }
                     
                     // Watched Directories
@@ -183,7 +199,7 @@ struct SettingsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 Spacer()
-                Text("v2.0.0")
+                Text("v1.0.0")
                     .font(.caption2)
                     .foregroundStyle(.quaternary)
             }
