@@ -3,6 +3,12 @@ import Foundation
 enum Constants {
     static let githubAPIURL = "https://api.github.com"
 
+    // GitHub OAuth
+    static let githubOAuthClientID = "Ov23liBVCZOUcDsJGC2G"
+    static let githubOAuthCallbackURL = "barticket://oauth/callback"
+    static let githubOAuthScopes = "repo project"
+    static let githubOAuthProxyURL = "https://bar-ticket-oauth.loganriedley.workers.dev"
+
     /// File extensions to watch for TODO comments
     static let watchedExtensions: Set<String> = [
         "swift", "ts", "tsx", "js", "jsx", "py", "rb", "go", "rs",

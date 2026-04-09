@@ -9,10 +9,16 @@ struct BarTicketApp: App {
     // Set up primary color to use Night District's pink and implement a consistent color scheme across the app (island, menu, settings, etc.)
     var body: some Scene {
         MenuBarExtra("Bar Ticket", systemImage: "ticket.fill") {
-            SettingsView()
-                .environment(appDelegate.appState)
-                .modelContainer(appDelegate.modelContainer)
-                .frame(width: 480, height: 440)
+            Group {
+                if appDelegate.appState.isAuthenticated {
+                    SettingsView()
+                } else {
+                    OnboardingView()
+                }
+            }
+            .environment(appDelegate.appState)
+            .modelContainer(appDelegate.modelContainer)
+            .frame(width: 480, height: appDelegate.appState.isAuthenticated ? 440 : 320)
         }
         .menuBarExtraStyle(.window)
     }
@@ -45,13 +51,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         bootstrap()
+        Task { @MainActor in
+            await appState.fetchUserIfNeeded()
+        }
+    }
+
+    func application(_ application: NSApplication, open urls: [URL]) {
+        guard let url = urls.first, url.scheme == "barticket" else { return }
+        Task { @MainActor in
+            if let result = await appState.authService.handleCallback(url: url) {
+                try? appState.saveAuth(token: result.token, user: result.user)
+            }
+        }
     }
 
     private func bootstrap() {
         let context = modelContainer.mainContext
 
-        // Load token
-        appState.loadToken()
+        // Load auth (OAuth token with PAT migration fallback)
+        appState.loadAuth()
 
         // Seed AppSettings if needed
         let settingsDescriptor = FetchDescriptor<AppSettings>()

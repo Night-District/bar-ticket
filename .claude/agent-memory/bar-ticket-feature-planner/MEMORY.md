@@ -1,1 +1,2 @@
 - [bar-ticket-site structure and deployment](project_bar-ticket-site-structure.md) — single index.html, 3 download-related buttons, GitHub Pages auto-deploy on push to main
+- [User: Logan Riedley](user_logan.md) — Solo macOS Swift developer, owns Bar Ticket end-to-end (app + site + deploy)

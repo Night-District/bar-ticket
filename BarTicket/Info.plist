@@ -20,5 +20,16 @@
 	<string>1</string>
 	<key>CFBundleIconName</key>
 	<string>bar_ticket_icon</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.nightdistrict.bar-ticket.oauth</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>barticket</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
