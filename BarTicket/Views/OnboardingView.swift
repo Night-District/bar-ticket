@@ -8,9 +8,9 @@ struct OnboardingView: View {
             Spacer()
 
             VStack(spacing: 20) {
-                Image(systemName: "ticket.fill")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.blue)
+                Image(nsImage: NSApp.applicationIconImage)
+                    .resizable()
+                    .frame(width: 64, height: 64)
 
                 VStack(spacing: 8) {
                     Text("Welcome to Bar Ticket")
@@ -31,15 +31,21 @@ struct OnboardingView: View {
                             if appState.authService.isExchangingToken {
                                 ProgressView()
                                     .controlSize(.small)
+                                
                                 Text("Connecting...")
                             } else {
-                                Image(systemName: "person.badge.key.fill")
+                                Image("github-icon")
+                                    .resizable()
+                                    .frame(width: 16, height: 16)
+                                
                                 Text("Sign in with GitHub")
                             }
                         }
                         .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
+                    .tint(.white)
+                    .foregroundStyle(.black)
                     .disabled(appState.authService.isExchangingToken)
 
                     if let error = appState.authService.error {
@@ -55,6 +61,8 @@ struct OnboardingView: View {
             Spacer()
 
             // Footer
+            //TODO: fix/center-button (#89 https://github.com/Night-District/bar-ticket/issues/89)
+            // Center this button horizontally
             HStack {
                 Button("Quit Bar Ticket") {
                     NSApplication.shared.terminate(nil)
@@ -62,7 +70,7 @@ struct OnboardingView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .center)
             .padding(.horizontal)
             .padding(.bottom, 12)
         }

@@ -12,6 +12,14 @@
 		<data>
 		ovFJMFOLMjzh8DLJKmXncj8JIgU=
 		</data>
+		<key>Resources/Assets.car</key>
+		<data>
+		TosRmSkiEwdRBCItIjOizwpXlU4=
+		</data>
+		<key>Resources/bar_ticket_icon.icns</key>
+		<data>
+		WXLr4nyAO6+5EL/LeNaIFChhkmc=
+		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
@@ -27,6 +35,20 @@
 			<key>hash2</key>
 			<data>
 			CNkOaUbb/qDQtbF/tlnXfu0j5EO3Rdjntbn6N4y3RHc=
+			</data>
+		</dict>
+		<key>Resources/Assets.car</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			G1mQa/FHf3I/qeCCW5PUM9tYy1xQvdtmhHVgCIniicA=
+			</data>
+		</dict>
+		<key>Resources/bar_ticket_icon.icns</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			xpnfAr48UR3fSOAJL7BObylghd/qxt7/J7w19Mm96dU=
 			</data>
 		</dict>
 	</dict>
