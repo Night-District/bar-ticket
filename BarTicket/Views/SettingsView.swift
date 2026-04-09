@@ -38,7 +38,7 @@ struct SettingsView: View {
             .padding()
 
             Divider()
-
+            
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     // GitHub Token

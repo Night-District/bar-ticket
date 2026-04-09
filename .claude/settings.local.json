@@ -71,7 +71,15 @@
       "Bash(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" /Users/loganriedley/Developer/night-district/bar-ticket/exports/BarTicket.app/Contents/Info.plist)",
       "Bash(file /Users/loganriedley/Developer/night-district/bar-ticket/Icons/bar_ticket_icon.icon/*)",
       "Bash(/tmp/bt-venv/bin/python3:*)",
-      "Bash(python3 -m json.tool)"
+      "Bash(python3 -m json.tool)",
+      "Bash(defaults read:*)",
+      "Bash(python3)",
+      "Bash(/tmp/create_icons.sh)",
+      "Bash(file BarTicket/Assets.xcassets/AppIcon.appiconset/*.png)",
+      "Bash(xargs -I {} sh -c 'cat {}/Contents/Info.plist | grep -A 1 \"CFBundleIconName\"')",
+      "Bash(ls -la /Users/loganriedley/Developer/night-district/bar-ticket/BarTicket/*.icon)",
+      "Bash(sips:*)",
+      "Bash(python3:*)"
     ]
   }
 }
