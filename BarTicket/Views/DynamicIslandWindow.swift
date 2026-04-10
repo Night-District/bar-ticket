@@ -123,7 +123,7 @@ final class DynamicIslandController {
             break
         }
     }
-
+    
     func dismiss() {
         dismissTask?.cancel()
         isVisible = false

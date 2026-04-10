@@ -171,8 +171,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appState.showIsland(state: .detecting(title: todo.title))
 
         // Resolve git repo
-        guard let repoInfo = GitResolver.resolve(filePath: todo.filePath) else {
-            appState.showIsland(state: .error(message: "Not a GitHub repository"))
+        let repoInfo: RepoInfo
+        do {
+            repoInfo = try GitResolver.resolve(filePath: todo.filePath)
+        } catch {
+            appState.showIsland(state: .error(message: error.localizedDescription))
             return
         }
 
