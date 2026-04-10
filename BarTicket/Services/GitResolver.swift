@@ -51,9 +51,7 @@ enum GitResolver {
             throw GitResolverError.noRemoteConfigured
         }
 
-        guard let info = parseGitHubURL(remoteURL, rootPath: root) else {
-            throw GitResolverError.remoteNotGitHub(remoteURL)
-        }
+        let info = try parseGitHubURL(remoteURL, rootPath: root)
 
         cache[root] = info
         return info
