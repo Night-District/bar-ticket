@@ -8,24 +8,50 @@ struct RepoInfo: Hashable {
     var fullName: String { "\(owner)/\(repo)" }
 }
 
+enum GitResolverError: LocalizedError {
+    case notGitRepository
+    case noRemoteConfigured
+    case remoteNotGitHub
+    case invalidGitHubURL
+    case unknown(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .notGitRepository:
+            return "File is not in a git repository"
+        case .noRemoteConfigured:
+            return "Git remote 'origin' is not configured"
+        case .remoteNotGitHub:
+            return "Remote 'origin' is not a GitHub repository"
+        case .invalidGitHubURL:
+            return "Unable to parse owner/repo from GitHub URL"
+        case .unknown(let message):
+            return message
+        }
+    }
+}
+
 enum GitResolver {
 
     /// Cache resolved repos by git root path
     private static var cache: [String: RepoInfo] = [:]
 
     /// Find the git repo root and GitHub remote for a file path
-    static func resolve(filePath: String) -> RepoInfo? {
+    static func resolve(filePath: String) throws -> RepoInfo {
         // Find .git root
-        guard let root = findGitRoot(from: filePath) else { return nil }
+        guard let root = findGitRoot(from: filePath) else {
+            throw GitResolverError.notGitRepository
+        }
 
         // Check cache
         if let cached = cache[root] { return cached }
 
         // Parse remote origin
-        guard let remoteURL = getRemoteURL(repoRoot: root),
-              let info = parseGitHubURL(remoteURL, rootPath: root) else {
-            return nil
+        guard let remoteURL = getRemoteURL(repoRoot: root) else {
+            throw GitResolverError.noRemoteConfigured
         }
+
+        let info = try parseGitHubURL(remoteURL, rootPath: root)
 
         cache[root] = info
         return info
@@ -77,7 +103,7 @@ enum GitResolver {
     /// - `https://github.com/owner/repo`
     /// - `git@github.com:owner/repo.git`
     /// - `ssh://git@github.com/owner/repo.git`
-    private static func parseGitHubURL(_ url: String, rootPath: String) -> RepoInfo? {
+    private static func parseGitHubURL(_ url: String, rootPath: String) throws -> RepoInfo {
         let cleaned = url
             .replacingOccurrences(of: ".git", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -86,7 +112,7 @@ enum GitResolver {
         if cleaned.hasPrefix("git@github.com:") {
             let path = String(cleaned.dropFirst("git@github.com:".count))
             let parts = path.split(separator: "/")
-            guard parts.count == 2 else { return nil }
+            guard parts.count == 2 else { throw GitResolverError.invalidGitHubURL }
             return RepoInfo(
                 owner: String(parts[0]),
                 repo: String(parts[1]),
@@ -97,11 +123,11 @@ enum GitResolver {
         // HTTPS format or SSH with scheme
         guard let parsed = URL(string: cleaned),
               parsed.host()?.contains("github.com") == true else {
-            return nil
+            throw GitResolverError.invalidGitHubURL
         }
 
         let pathComponents = parsed.pathComponents.filter { $0 != "/" }
-        guard pathComponents.count >= 2 else { return nil }
+        guard pathComponents.count >= 2 else { throw GitResolverError.invalidGitHubURL }
 
         return RepoInfo(
             owner: pathComponents[0],

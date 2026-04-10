@@ -395,10 +395,17 @@ struct ProjectDropdownButton: View {
     private func resolveOwner() -> String? {
         // Use any file in the directory to resolve git remote
         let testPath = directory.path + "/.git/config"
-        if let repoInfo = GitResolver.resolve(filePath: testPath) {
+        do {
+            let repoInfo = try GitResolver.resolve(filePath: testPath)
             return repoInfo.owner
+        } catch {
+            // Fallback: try the directory path itself
+            do {
+                let repoInfo = try GitResolver.resolve(filePath: directory.path + "/placeholder")
+                return repoInfo.owner
+            } catch {
+                return nil
+            }
         }
-        // Fallback: try the directory path itself
-        return GitResolver.resolve(filePath: directory.path + "/placeholder")?.owner
     }
 }
