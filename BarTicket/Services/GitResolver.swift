@@ -11,7 +11,7 @@ struct RepoInfo: Hashable {
 enum GitResolverError: LocalizedError {
     case notGitRepository
     case noRemoteConfigured
-    case remoteNotGitHub(String)
+    case remoteNotGitHub
     case invalidGitHubURL
     case unknown(String)
 
@@ -21,8 +21,8 @@ enum GitResolverError: LocalizedError {
             return "File is not in a git repository"
         case .noRemoteConfigured:
             return "Git remote 'origin' is not configured"
-        case .remoteNotGitHub(let url):
-            return "Remote is not a GitHub URL: \(url)"
+        case .remoteNotGitHub:
+            return "Remote 'origin' is not a GitHub repository"
         case .invalidGitHubURL:
             return "Unable to parse owner/repo from GitHub URL"
         case .unknown(let message):
