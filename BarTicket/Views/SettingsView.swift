@@ -8,6 +8,11 @@ struct SettingsView: View {
     @Query(sort: \WatchedDirectory.addedAt, order: .reverse) private var directories: [WatchedDirectory]
     @Query(sort: \SeenTodo.createdAt, order: .reverse) private var seenTodos: [SeenTodo]
     @Query private var cachedProjects: [ProjectCache]
+    @Query(sort: \IssueTemplate.createdAt) private var issueTemplates: [IssueTemplate]
+
+    @State private var claudeKeyInput = ""
+    @State private var hasExistingKey = false
+    @State private var showCustomTemplateAlert = false
 
     private var appSettings: AppSettings? { settings.first }
 
@@ -96,6 +101,8 @@ struct SettingsView: View {
                     }
                     
                     // Watched Directories
+                    //TODO: fix/watch-directory-ui (#100 https://github.com/Night-District/bar-ticket/issues/100)
+                    // Make Watched Directories GroupBox expand to full width when no directories are selected
                     GroupBox {
                         VStack(alignment: .leading, spacing: 8) {
                             Label("Watched Directories", systemImage: "folder.fill")
@@ -148,7 +155,94 @@ struct SettingsView: View {
                         .padding(.vertical, 2)
                     }
 
-                    // Recent Issues
+                    // AI Issue Expansion
+                    GroupBox {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("AI Issue Expansion", systemImage: "sparkles")
+                                .font(.caption.bold())
+
+                            Toggle("Expand TODOs with AI", isOn: aiToggle)
+                                .font(.caption)
+                                .toggleStyle(.switch)
+                                .controlSize(.small)
+
+                            if appSettings?.aiEnabled == true {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    HStack(spacing: 6) {
+                                        SecureField(
+                                            hasExistingKey ? "sk-ant-••••••••" : "Claude API Key",
+                                            text: $claudeKeyInput
+                                        )
+                                        .font(.system(.caption, design: .monospaced))
+                                        .textFieldStyle(.roundedBorder)
+                                        .onSubmit { saveClaudeKey() }
+
+                                        if let url = URL(string: "https://console.anthropic.com/") {
+                                            Link(destination: url) {
+                                                Text("Get key")
+                                                    .font(.caption2)
+                                                    .foregroundStyle(.blue)
+                                            }
+                                        }
+                                    }
+
+                                    DisclosureGroup {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            ForEach(issueTemplates) { template in
+                                                HStack(spacing: 6) {
+                                                    Image(systemName: template.isBuiltIn ? "lock.fill" : "doc.text")
+                                                        .font(.caption2)
+                                                        .foregroundStyle(template.isBuiltIn ? .secondary : Color.blue)
+                                                    Text(template.name)
+                                                        .font(.caption)
+                                                    Spacer()
+                                                    Text(template.templateDescription)
+                                                        .font(.caption2)
+                                                        .foregroundStyle(.secondary)
+                                                        .lineLimit(1)
+                                                    if !template.isBuiltIn {
+                                                        Button {
+                                                            modelContext.delete(template)
+                                                            try? modelContext.save()
+                                                        } label: {
+                                                            Image(systemName: "xmark.circle.fill")
+                                                                .font(.caption2)
+                                                                .foregroundStyle(.secondary)
+                                                        }
+                                                        .buttonStyle(.plain)
+                                                    }
+                                                }
+                                                .padding(.vertical, 1)
+                                            }
+
+                                            Button {
+                                                showCustomTemplateAlert = true
+                                            } label: {
+                                                Label("Add Template...", systemImage: "plus")
+                                                    .font(.caption)
+                                            }
+                                            .padding(.top, 2)
+                                        }
+                                    } label: {
+                                        Text("Templates")
+                                            .font(.caption)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.vertical, 2)
+                    }
+                    .onAppear {
+                        hasExistingKey = KeychainService.read(key: .claudeAPIKey) != nil
+                    }
+                    .alert("Custom Templates", isPresented: $showCustomTemplateAlert) {
+                        Button("OK", role: .cancel) { }
+                    } message: {
+                        Text("Custom templates are coming in a future update.")
+                    }
+
+                    //TODO: refactor/view (#98 https://github.com/Night-District/bar-ticket/issues/98)
+                    // Refactor the following view into a separate RecentIssuesView for better readability and maintainability.
                     if !appState.recentIssues.isEmpty {
                         GroupBox {
                             VStack(alignment: .leading, spacing: 8) {
@@ -226,6 +320,23 @@ struct SettingsView: View {
                 }
             }
         )
+    }
+
+    private var aiToggle: Binding<Bool> {
+        Binding(
+            get: { appSettings?.aiEnabled ?? true },
+            set: { newValue in
+                appSettings?.aiEnabled = newValue
+                try? modelContext.save()
+            }
+        )
+    }
+
+    private func saveClaudeKey() {
+        guard !claudeKeyInput.isEmpty else { return }
+        try? KeychainService.save(key: .claudeAPIKey, value: claudeKeyInput)
+        hasExistingKey = true
+        claudeKeyInput = ""
     }
 
     // MARK: - Actions

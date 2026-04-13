@@ -4,6 +4,7 @@ import Security
 enum KeychainKey: String {
     case githubToken = "com.nightdistrict.bar-ticket.github-token"
     case githubOAuthToken = "com.nightdistrict.bar-ticket.github-oauth-token"
+    case claudeAPIKey = "com.nightdistrict.bar-ticket.claude-api-key"
 }
 
 enum KeychainService {

@@ -4,10 +4,12 @@ import SwiftData
 @Model
 final class AppSettings {
     var isWatchingEnabled: Bool
+    var aiEnabled: Bool
     var createdAt: Date
 
-    init(isWatchingEnabled: Bool = true) {
+    init(isWatchingEnabled: Bool = true, aiEnabled: Bool = true) {
         self.isWatchingEnabled = isWatchingEnabled
+        self.aiEnabled = aiEnabled
         self.createdAt = Date()
     }
 }
