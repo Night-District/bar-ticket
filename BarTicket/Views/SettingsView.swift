@@ -158,13 +158,17 @@ struct SettingsView: View {
                     // AI Issue Expansion
                     GroupBox {
                         VStack(alignment: .leading, spacing: 8) {
-                            Label("AI Issue Expansion", systemImage: "sparkles")
-                                .font(.caption.bold())
-
-                            Toggle("Expand TODOs with AI", isOn: aiToggle)
-                                .font(.caption)
-                                .toggleStyle(.switch)
-                                .controlSize(.small)
+                            HStack {
+                                Label("AI Issue Expansion", systemImage: "sparkles")
+                                    .font(.caption.bold())
+                                
+                                Spacer()
+                                
+                                Toggle("Expand TODOs with AI", isOn: aiToggle)
+                                    .font(.caption)
+                                    .toggleStyle(.switch)
+                                    .controlSize(.small)
+                            }
 
                             if appSettings?.aiEnabled == true {
                                 VStack(alignment: .leading, spacing: 6) {
@@ -214,7 +218,9 @@ struct SettingsView: View {
                                                 }
                                                 .padding(.vertical, 1)
                                             }
-
+                                            
+                                            //TODO: fix/alert (#102 https://github.com/Night-District/bar-ticket/issues/102)
+                                            // alerts in Menu Bar apps do not function properly. When the button within the sheet is pressed, the view is dismissed and the alert remains open.
                                             Button {
                                                 showCustomTemplateAlert = true
                                             } label: {
