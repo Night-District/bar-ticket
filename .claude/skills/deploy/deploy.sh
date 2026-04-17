@@ -65,6 +65,7 @@ echo "Populating DMG..."
 osascript -e "tell application \"Finder\" to make alias file to POSIX file \"/Applications\" at POSIX file \"$MOUNT_POINT\""
 mkdir -p "$MOUNT_POINT/.background"
 cp "$BACKGROUND_SRC" "$MOUNT_POINT/.background/background.png"
+chflags hidden "$MOUNT_POINT/.background"
 
 # Copy the staged app (non-.app name avoids hdiutil restriction)
 ditto "$STAGING_DIR/$STAGE_APP_NAME.app" "$MOUNT_POINT/$STAGE_APP_NAME.app" 2>/dev/null || \
@@ -100,8 +101,6 @@ tell application "Finder"
 
     set position of item "$APP_NAME.app" of container window to {165, 170}
     set position of item "Applications" of container window to {495, 170}
-    set position of item ".background" of container window to {999, 999}
-
     update without registering applications
     delay 2
     close
