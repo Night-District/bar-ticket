@@ -6,6 +6,8 @@
 	<string>25C56</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>Bar Ticket</string>
 	<key>CFBundleExecutable</key>
 	<string>BarTicket</string>
 	<key>CFBundleIconFile</key>

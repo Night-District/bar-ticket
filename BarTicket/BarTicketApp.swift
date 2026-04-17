@@ -32,14 +32,15 @@ struct BarTicketApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let appState = AppState()
     
-    //TODO: feat/add-schema (#54 https://github.com/Night-District/bar-ticket/issues/54)
-    // Add schemas to support database migrations preventing crashes
+    //TODO: persistence/swift-data-migration (#99 https://github.com/Night-District/bar-ticket/issues/99)
+    // Implement a migration strategy for SwiftData models as the app evolves. This could involve lightweight migrations for simple changes or a more robust versioning system for complex schema updates.
     let modelContainer: ModelContainer = {
         let schema = Schema([
             AppSettings.self,
             WatchedDirectory.self,
             SeenTodo.self,
-            ProjectCache.self
+            ProjectCache.self,
+            IssueTemplate.self
         ])
         let config = ModelConfiguration("BarTicket", isStoredInMemoryOnly: false)
         do {
@@ -77,6 +78,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             context.insert(AppSettings())
             try? context.save()
         }
+
+        // Seed built-in issue templates if needed
+        IssueTemplateService.seedIfNeeded(context: context)
 
         // Populate recent issues from SwiftData
         var seenDescriptor = FetchDescriptor<SeenTodo>(sortBy: [SortDescriptor(\.createdAt, order: .reverse)])
@@ -188,16 +192,62 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // Hold detecting state so user can read it
             try? await Task.sleep(for: .seconds(1.0))
 
+            // AI expansion (if enabled)
+            var issueTitle = todo.title
+            var issueBody = todo.issueBody
+            var issueLabels: [String] = []
+
+            let settings = (try? context.fetch(FetchDescriptor<AppSettings>()))?.first
+            if settings?.aiEnabled == true {
+                appState.showIsland(state: .expanding(title: todo.title))
+                let expandingShownAt = ContinuousClock.now
+                print("[BarTicket] AI expansion started for: \"\(todo.title)\"")
+
+                do {
+                    let templates = IssueTemplateService.fetchAll(context: context)
+
+                    // Read the source file for context
+                    let fileContext = try? String(contentsOfFile: todo.filePath, encoding: .utf8)
+
+                    // Look for CLAUDE.md in the git repo root
+                    let claudeMDPath = repoInfo.rootPath + "/CLAUDE.md"
+                    let claudeMD = try? String(contentsOfFile: claudeMDPath, encoding: .utf8)
+
+                    let result = try await ClaudeClient.generateIssue(
+                        rawTodo: todo.title,
+                        templates: templates,
+                        fileContext: fileContext,
+                        claudeMD: claudeMD
+                    )
+
+                    issueTitle = result.title
+                    issueBody = result.body
+                    issueLabels = result.labels
+                    print("[BarTicket] AI expansion succeeded: title=\"\(result.title)\" labels=\(result.labels)")
+                } catch {
+                    print("[BarTicket] AI expansion failed, using raw TODO: \(error)")
+                    appState.showIsland(state: .error(message: "AI unavailable — using raw TODO"))
+                    try? await Task.sleep(for: .seconds(1.5))
+                }
+
+                // Enforce minimum expanding display time
+                let elapsed = ContinuousClock.now - expandingShownAt
+                if elapsed < .seconds(Constants.claudeExpandDuration) {
+                    try? await Task.sleep(for: .seconds(Constants.claudeExpandDuration) - elapsed)
+                }
+            }
+
             // Transition to creating state
-            appState.showIsland(state: .creating(title: todo.title))
+            appState.showIsland(state: .creating(title: issueTitle))
             let creatingShownAt = ContinuousClock.now
 
             do {
                 let response = try await GitHubClient.createIssue(
                     owner: repoInfo.owner,
                     repo: repoInfo.repo,
-                    title: todo.title,
-                    body: todo.issueBody,
+                    title: issueTitle,
+                    body: issueBody,
+                    labels: issueLabels,
                     token: token
                 )
 

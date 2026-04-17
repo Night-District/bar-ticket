@@ -37,4 +37,20 @@ enum Constants {
 
     /// FSEvents latency in seconds
     static let fsEventsLatency: TimeInterval = 0.25
+
+    // Claude AI
+    static let claudeAPIURL = "https://api.anthropic.com/v1/messages"
+    static let claudeModel = "claude-haiku-4-5-20251001"
+    static let claudeAPIVersion = "2023-06-01"
+    static let claudeMaxTokens = 2048
+    static let claudeExpandDuration: TimeInterval = 1.0
+
+    static let systemPrompt = """
+        You are an expert software project manager who writes clear, actionable GitHub issues. \
+        Given a user's raw idea or bug report and an issue template, you produce a well-structured issue. \
+        Return ONLY valid JSON with exactly these keys: "title" (concise issue title as a string), \
+        "body" (the full issue body in markdown following the template structure), \
+        "labels" (an array of 1-3 relevant label strings like "bug", "enhancement", "documentation"). \
+        Do not wrap the JSON in code fences or add any other text.
+        """
 }
