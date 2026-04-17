@@ -170,6 +170,8 @@ struct SettingsView: View {
                                     .controlSize(.small)
                             }
 
+                            //TODO: fix/function (#104 https://github.com/Night-District/bar-ticket/issues/104)
+                            // Fix this function 
                             if appSettings?.aiEnabled == true {
                                 VStack(alignment: .leading, spacing: 6) {
                                     HStack(spacing: 6) {
