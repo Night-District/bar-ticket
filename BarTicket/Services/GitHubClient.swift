@@ -47,14 +47,19 @@ enum GitHubClient {
         repo: String,
         title: String,
         body: String,
+        labels: [String] = [],
         token: String
     ) async throws -> GitHubIssueResponse {
         let url = "\(Constants.githubAPIURL)/repos/\(owner)/\(repo)/issues"
 
-        let parameters: [String: Any] = [
+        var parameters: [String: Any] = [
             "title": title,
             "body": body
         ]
+
+        if !labels.isEmpty {
+            parameters["labels"] = labels
+        }
 
         let response = AF.request(
             url,

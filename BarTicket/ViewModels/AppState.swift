@@ -4,6 +4,7 @@ import SwiftData
 enum IslandState: Equatable {
     case hidden
     case detecting(title: String)
+    case expanding(title: String)
     case creating(title: String)
     case updating(title: String)
     case confirmed(

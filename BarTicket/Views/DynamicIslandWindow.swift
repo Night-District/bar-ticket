@@ -52,6 +52,18 @@ final class DynamicIslandController {
             viewModel.projectFailed = false
             viewModel.isV2Project = false
 
+        case .expanding(let title):
+            viewModel.icon = "sparkles"
+            viewModel.iconColor = .purple
+            viewModel.iconAnimation = .pulsing
+            viewModel.title = "Expanding with AI..."
+            viewModel.subtitle = title
+            viewModel.issueURL = nil
+            viewModel.projectName = nil
+            viewModel.projectURL = nil
+            viewModel.projectFailed = false
+            viewModel.isV2Project = false
+
         case .creating(let title):
             viewModel.icon = "arrow.trianglehead.2.counterclockwise"
             viewModel.iconColor = .orange

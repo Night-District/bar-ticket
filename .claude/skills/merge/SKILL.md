@@ -40,13 +40,13 @@ Report: `PR #<N>: <url>`
 
 ### 3. Show the diff
 
-Display what will be merged — commits and a stat summary:
+Display what will be merged — commits and full diff:
 ```bash
 git log main..dev --oneline
-git diff main...dev --stat
+git diff main...dev
 ```
 
-Print both outputs for the user to review.
+Print both outputs for the user to review. The full diff shows all changes that will be merged.
 
 ### 4. Ask for confirmation
 
