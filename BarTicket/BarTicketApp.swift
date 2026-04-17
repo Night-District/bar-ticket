@@ -26,8 +26,6 @@ struct BarTicketApp: App {
 
 // MARK: - App Delegate
 
-//TODO: fix/app-name (#106 https://github.com/Night-District/bar-ticket/issues/106)
-// App name appears as BarTicket in Finder and on the mac Desktop. Change it to "Bar Ticket" for better readability.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let appState = AppState()
