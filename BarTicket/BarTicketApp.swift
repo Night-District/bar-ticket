@@ -26,8 +26,8 @@ struct BarTicketApp: App {
 
 // MARK: - App Delegate
 
-//TODO: change/drag-and-drop-window-behavior (#65 https://github.com/Night-District/bar-ticket/issues/65)
-// The common solution is handling it in the app on first launch: detect it's running from a mounted DMG, offer to move to /Applications, eject the DMG, and relaunch from the correct location.
+//TODO: fix/app-name (#106 https://github.com/Night-District/bar-ticket/issues/106)
+// App name appears as BarTicket in Finder and on the mac Desktop. Change it to "Bar Ticket" for better readability.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let appState = AppState()
