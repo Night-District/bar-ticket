@@ -39,7 +39,7 @@ final class KanbanSyncService {
             appState.kanbanBoard = nil
             return
         }
-        guard let projectId = appState.activeWatchedDirectory?.selectedProjectNodeId else {
+        guard let projectId = appState.kanbanProjectOverride ?? appState.activeWatchedDirectory?.selectedProjectNodeId else {
             // No project selected for active dir — clear board but keep service running
             if lastProjectNodeId != nil {
                 appState.kanbanBoard = nil

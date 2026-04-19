@@ -9,7 +9,9 @@ struct KanbanExpandedView: View {
             if let board = viewModel.kanbanBoard {
                 BoardContent(
                     board: board,
-                    onCardCopied: viewModel.kanbanOnCardCopied
+                    onCardCopied: viewModel.kanbanOnCardCopied,
+                    availableProjects: viewModel.availableProjects,
+                    onPickProject: viewModel.kanbanOnPickProject
                 )
             } else if let error = viewModel.kanbanFetchError {
                 ErrorState(message: error) {
@@ -52,6 +54,9 @@ struct KanbanExpandedView: View {
 private struct BoardContent: View {
     let board: KanbanBoard
     let onCardCopied: ((KanbanCard) -> Void)?
+    let availableProjects: [(nodeId: String, name: String)]
+    let onPickProject: ((String) -> Void)?
+    @State private var showingPicker = false
 
     // DynamicNotchKit sizes the panel to screen.width / 2, with ~60pt consumed by
     // safe-area insets and corner-radius padding. Cap board width accordingly so
@@ -64,23 +69,52 @@ private struct BoardContent: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                Image(systemName: "rectangle.3.group.fill")
-                    .foregroundStyle(Color(red: 0.55, green: 0.37, blue: 0.96))
+                HStack(spacing: 8) {
+                    Image(systemName: "rectangle.3.group.fill")
+                        .foregroundStyle(Color(red: 0.55, green: 0.37, blue: 0.96))
 
-                Text(board.projectTitle)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
+                    Text(board.projectTitle)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    if let url = URL(string: board.projectURL) {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
+
+                if !availableProjects.isEmpty {
+                    Button {
+                        showingPicker = true
+                    } label: {
+                        Image(systemName: "chevron.up.chevron.down")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.gray)
+                            .frame(width: 16, height: 16)
+                    }
+                    .buttonStyle(.plain)
+                    .popover(isPresented: $showingPicker) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(availableProjects, id: \.nodeId) { project in
+                                Button(project.name) {
+                                    onPickProject?(project.nodeId)
+                                    showingPicker = false
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
 
                 Spacer()
             }
             .padding(.horizontal, 12)
             .padding(.top, 8)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                if let url = URL(string: board.projectURL) {
-                    NSWorkspace.shared.open(url)
-                }
-            }
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 10) {
@@ -242,6 +276,7 @@ private struct CardLabels: View {
                     .padding(.vertical, 2)
                     .background(Capsule().fill(label.color.opacity(0.85)))
             }
+            
             if labels.count > 3 {
                 Text("+\(labels.count - 3)")
                     .font(.system(size: 8))

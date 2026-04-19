@@ -17,6 +17,7 @@
 		A300BB00CC00DD00EE00FF03 /* ClaudeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A310BB10CC10DD10EE10FF33 /* ClaudeClient.swift */; };
 		A400BB00CC00DD00EE00FF04 /* IssueTemplateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A410BB10CC10DD10EE10FF44 /* IssueTemplateService.swift */; };
 		28E9A422848D3D302A0D03E7 /* FileWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E008ACE6FA2659DE4A51EBE /* FileWatcher.swift */; };
+		FA01BB02CC03DD04EE05FF07 /* ForegroundAppWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA11BB12CC13DD14EE15FF17 /* ForegroundAppWatcher.swift */; };
 		3F68F380495D45FA16C297DC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8AC6143CA7BF64B2BAF007 /* SettingsView.swift */; };
 		540CF3013DBBBBF326F1C9AC /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E90F4B01A5C198FE0307701 /* AppState.swift */; };
 		5C52FC8A2F68AE2B24A99488 /* BarTicketApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F507DC7CA0D9F143237B4B34 /* BarTicketApp.swift */; };
@@ -59,6 +60,7 @@
 		7CD0577A2F872E72009D7363 /* bar_ticket_icon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = bar_ticket_icon.icon; sourceTree = "<group>"; };
 		7F577904FD1BA62C74B9F423 /* BarTicket.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BarTicket.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E008ACE6FA2659DE4A51EBE /* FileWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWatcher.swift; sourceTree = "<group>"; };
+		FA11BB12CC13DD14EE15FF17 /* ForegroundAppWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForegroundAppWatcher.swift; sourceTree = "<group>"; };
 		AA11BB12CC13DD14EE15FF16 /* GitHubUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubUser.swift; sourceTree = "<group>"; };
 		B12C96699CD1DE993D65E76A /* ProjectCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectCache.swift; sourceTree = "<group>"; };
 		BA11CB12DC13ED14FE15AF16 /* GitHubAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubAuthService.swift; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 				BA11CB12DC13ED14FE15AF16 /* GitHubAuthService.swift */,
 				A310BB10CC10DD10EE10FF33 /* ClaudeClient.swift */,
 				8E008ACE6FA2659DE4A51EBE /* FileWatcher.swift */,
+				FA11BB12CC13DD14EE15FF17 /* ForegroundAppWatcher.swift */,
 				6E23A849A4DDD594F868BA63 /* GitHubClient.swift */,
 				1F29F001926B68BA31797C6F /* GitHubProjectsClient.swift */,
 				672C9A318AC41F205C94733E /* GitResolver.swift */,
@@ -264,6 +267,7 @@
 				F610043466E0E1C7807AFD68 /* Constants.swift in Sources */,
 				F12E6D92B7591973EF6384F1 /* DynamicIslandWindow.swift in Sources */,
 				28E9A422848D3D302A0D03E7 /* FileWatcher.swift in Sources */,
+				FA01BB02CC03DD04EE05FF07 /* ForegroundAppWatcher.swift in Sources */,
 				BA01CB02DC03ED04FE05AF06 /* GitHubAuthService.swift in Sources */,
 				D28CDF2D71D68A356EEAF58C /* GitHubClient.swift in Sources */,
 				A1512A73640C9D588F6FA140 /* GitHubProjectsClient.swift in Sources */,

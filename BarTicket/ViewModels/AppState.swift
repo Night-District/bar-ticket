@@ -39,6 +39,7 @@ final class AppState {
 
     // Kanban
     var activeWatchedDirectory: WatchedDirectory?
+    var kanbanProjectOverride: String?
     var kanbanBoard: KanbanBoard?
     var kanbanFetchError: String?
     var needsProjectScope: Bool = false
@@ -104,8 +105,9 @@ final class AppState {
     /// compact notch has something to render before the first fetch lands.
     @MainActor
     func setActiveWatchedDirectory(_ directory: WatchedDirectory?, projectName: String?) {
-        let oldProjectId = activeWatchedDirectory?.selectedProjectNodeId
+        let oldProjectId = kanbanProjectOverride ?? activeWatchedDirectory?.selectedProjectNodeId
         let newProjectId = directory?.selectedProjectNodeId
+        kanbanProjectOverride = nil
         activeWatchedDirectory = directory
         islandController?.viewModel.kanbanProjectName = projectName
         if oldProjectId != newProjectId {

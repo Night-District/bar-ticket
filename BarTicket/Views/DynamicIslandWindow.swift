@@ -43,6 +43,8 @@ final class NotchViewModel {
     var kanbanOnExpand: (() -> Void)?
     var kanbanOnDismiss: (() -> Void)?
     var kanbanOnRefresh: (() -> Void)?
+    var availableProjects: [(nodeId: String, name: String)] = []
+    var kanbanOnPickProject: ((String) -> Void)?
 }
 
 @MainActor
