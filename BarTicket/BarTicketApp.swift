@@ -4,6 +4,8 @@ import SwiftData
 @main
 struct BarTicketApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    //TODO: fix/persisted-dynamic-island-state (#109 https://github.com/Night-District/bar-ticket/issues/109)
+    // The Dynamic Island is currently showing when issues are not being created. Ensure that the dynamic island only appears during the issue creation flow and is dismissed afterward, rather than remaining visible indefinitely.
     
     //TODO: design/primary-color (#55 https://github.com/Night-District/bar-ticket/issues/55)
     // Set up primary color to use Night District's pink and implement a consistent color scheme across the app (island, menu, settings, etc.)
@@ -52,6 +54,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         bootstrap()
         Task { @MainActor in
             await appState.fetchUserIfNeeded()
+            await appState.refreshProjectScopeCheck()
+            appState.kanbanSync?.start()
+            appState.refreshKanbanAmbient()
         }
     }
 
@@ -60,6 +65,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Task { @MainActor in
             if let result = await appState.authService.handleCallback(url: url) {
                 try? appState.saveAuth(token: result.token, user: result.user)
+                await appState.refreshProjectScopeCheck()
+                appState.kanbanSync?.start()
+                appState.refreshKanbanAmbient()
             }
         }
     }
@@ -100,6 +108,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Initialize services
         setupFileWatcher(context: context)
         setupDynamicIsland()
+        setupKanbanSync(context: context)
+        setupActiveDirectoryDefault(context: context)
 
         print("[BarTicket] Bootstrap complete. Token: \(appState.githubToken != nil ? "present" : "missing")")
     }
@@ -130,6 +140,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         watcher.onTodoDetected = { [weak self] todo in
             print("[BarTicket] TODO detected: \"\(todo.title)\" in \(todo.filePath):\(todo.lineNumber)")
             DispatchQueue.main.async {
+                self?.updateActiveDirectory(forFilePath: todo.filePath, context: context)
                 self?.handleNewTodo(todo, context: context)
             }
         }
@@ -138,6 +149,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         watcher.onTodoUpdated = { [weak self] updated in
             print("[BarTicket] TODO updated: \"\(updated.new.title)\" issue #\(updated.old.issueNumber) on \(updated.old.repoFullName)")
             DispatchQueue.main.async {
+                self?.updateActiveDirectory(forFilePath: updated.new.filePath, context: context)
                 self?.handleUpdatedTodo(updated, context: context)
             }
         }
@@ -156,7 +168,65 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setupDynamicIsland() {
-        appState.islandController = DynamicIslandController()
+        let controller = DynamicIslandController()
+        appState.islandController = controller
+
+        // "Select a Project" button in the empty Kanban state opens settings.
+        controller.viewModel.kanbanOnSelectProject = { [weak self] in
+            guard let self else { return }
+            Task { @MainActor in
+                if !self.appState.isAuthenticated {
+                    self.appState.authService.startOAuthFlow()
+                } else if self.appState.needsProjectScope {
+                    self.appState.authService.startOAuthFlow()
+                } else {
+                    // Pop the menu bar item open so the user can pick a project
+                    NSApp.activate(ignoringOtherApps: true)
+                }
+            }
+        }
+
+        controller.viewModel.kanbanOnRefresh = { [weak self] in
+            self?.appState.kanbanSync?.refresh(force: true)
+        }
+    }
+
+    private func setupKanbanSync(context: ModelContext) {
+        let sync = KanbanSyncService(appState: appState)
+        appState.kanbanSync = sync
+    }
+
+    /// On launch, default the active directory to the first enabled watched
+    /// directory that has a project selected, so the ambient Kanban has
+    /// something to display before the user edits a file.
+    private func setupActiveDirectoryDefault(context: ModelContext) {
+        let descriptor = FetchDescriptor<WatchedDirectory>()
+        guard let directories = try? context.fetch(descriptor) else { return }
+        let candidate = directories.first { $0.isEnabled && $0.selectedProjectNodeId != nil }
+            ?? directories.first(where: \.isEnabled)
+        guard let candidate else { return }
+
+        let projectName: String? = {
+            guard let id = candidate.selectedProjectNodeId else { return nil }
+            let all = (try? context.fetch(FetchDescriptor<ProjectCache>())) ?? []
+            return all.first { $0.projectNodeId == id }?.displayName
+        }()
+        appState.setActiveWatchedDirectory(candidate, projectName: projectName)
+    }
+
+    /// Resolve a file path back to its watched directory and set it active.
+    @MainActor
+    private func updateActiveDirectory(forFilePath path: String, context: ModelContext) {
+        let descriptor = FetchDescriptor<WatchedDirectory>()
+        guard let directories = try? context.fetch(descriptor),
+              let dir = directories.first(where: { path.hasPrefix($0.path) }) else { return }
+        guard appState.activeWatchedDirectory?.path != dir.path else { return }
+        let projectName: String? = {
+            guard let id = dir.selectedProjectNodeId else { return nil }
+            let all = (try? context.fetch(FetchDescriptor<ProjectCache>())) ?? []
+            return all.first { $0.projectNodeId == id }?.displayName
+        }()
+        appState.setActiveWatchedDirectory(dir, projectName: projectName)
     }
 
     // MARK: - TODO Handling Pipeline

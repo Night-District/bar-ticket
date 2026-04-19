@@ -43,6 +43,10 @@ struct SettingsView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    if appState.needsProjectScope {
+                        KanbanReauthBanner()
+                    }
+
                     // GitHub Account
                     GroupBox {
                         HStack {
@@ -375,6 +379,54 @@ struct SettingsView: View {
     }
 }
 
+// MARK: - Kanban reauth banner
+
+private struct KanbanReauthBanner: View {
+    @Environment(AppState.self) private var appState
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "key.fill")
+                .foregroundStyle(Color(red: 0.55, green: 0.37, blue: 0.96))
+                .font(.system(size: 16))
+                .padding(.top, 2)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Kanban needs extra GitHub permissions")
+                    .font(.caption.bold())
+                Text("Sign in again to grant read:project access. The board won't load until you do.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Button {
+                appState.authService.startOAuthFlow()
+            } label: {
+                Text("Reauth")
+                    .font(.caption.bold())
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule().fill(Color(red: 0.55, green: 0.37, blue: 0.96))
+                    )
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(10)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color(red: 0.55, green: 0.37, blue: 0.96).opacity(0.1))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(Color(red: 0.55, green: 0.37, blue: 0.96).opacity(0.3), lineWidth: 0.5)
+                )
+        )
+    }
+}
+
 // MARK: - ProjectDropdownButton
 
 struct ProjectDropdownButton: View {
@@ -383,6 +435,7 @@ struct ProjectDropdownButton: View {
     let token: String?
 
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppState.self) private var appState
 
     @State private var isFetching = false
     @State private var fetchError: String?
@@ -395,7 +448,20 @@ struct ProjectDropdownButton: View {
     private var grouped: [(owner: String, projects: [ProjectCache])] {
         let byOwner = Dictionary(grouping: cachedProjects, by: \.owner)
         return byOwner.keys.sorted().map { owner in
-            (owner: owner, projects: byOwner[owner]!.sorted { $0.displayName < $1.displayName })
+            // Board-layout projects first, then non-board (grayed out).
+            let sorted = byOwner[owner]!.sorted { a, b in
+                if a.hasBoardLayout != b.hasBoardLayout { return a.hasBoardLayout }
+                return a.displayName < b.displayName
+            }
+            return (owner: owner, projects: sorted)
+        }
+    }
+
+    private func selectProject(_ project: ProjectCache?) {
+        directory.selectedProjectNodeId = project?.projectNodeId
+        try? modelContext.save()
+        if appState.activeWatchedDirectory?.path == directory.path {
+            appState.setActiveWatchedDirectory(directory, projectName: project?.displayName)
         }
     }
 
@@ -422,8 +488,7 @@ struct ProjectDropdownButton: View {
 
                 // No project option
                 Button {
-                    directory.selectedProjectNodeId = nil
-                    try? modelContext.save()
+                    selectProject(nil)
                 } label: {
                     HStack {
                         Text("No project")
@@ -440,12 +505,18 @@ struct ProjectDropdownButton: View {
                     Section(group.owner) {
                         ForEach(group.projects, id: \.projectNodeId) { project in
                             Button {
-                                directory.selectedProjectNodeId = project.projectNodeId
-                                try? modelContext.save()
+                                selectProject(project)
                             } label: {
                                 HStack {
-                                    Image(systemName: project.isV2 ? "sparkles" : "folder.fill")
+                                    Image(systemName: project.hasBoardLayout
+                                        ? "rectangle.3.group.fill"
+                                        : (project.isV2 ? "sparkles" : "folder.fill"))
                                     Text(project.displayName)
+                                    if !project.hasBoardLayout {
+                                        Text("— no board view")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                    }
                                     if directory.selectedProjectNodeId == project.projectNodeId {
                                         Spacer()
                                         Image(systemName: "checkmark")

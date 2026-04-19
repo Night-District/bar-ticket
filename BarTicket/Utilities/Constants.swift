@@ -6,7 +6,11 @@ enum Constants {
     // GitHub OAuth
     static let githubOAuthClientID = "Ov23liBVCZOUcDsJGC2G"
     static let githubOAuthCallbackURL = "barticket://oauth/callback"
-    static let githubOAuthScopes = "repo project"
+    static let githubOAuthScopes = "repo read:project"
+
+    /// Scopes this build of Bar Ticket needs for full Kanban functionality.
+    /// A token with any of these in its X-OAuth-Scopes header is considered sufficient.
+    static let requiredProjectScopes: Set<String> = ["read:project", "project"]
     static let githubOAuthProxyURL = "https://bar-ticket-oauth.loganriedley.workers.dev"
 
     /// File extensions to watch for TODO comments
