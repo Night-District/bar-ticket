@@ -51,7 +51,6 @@ final class NotchViewModel {
 final class DynamicIslandController {
     private var notch: DynamicNotch<NotchExpandedView, NotchCompactLeading, NotchCompactTrailing>?
     let viewModel = NotchViewModel()
-    private var dismissTask: Task<Void, Never>?
     private var returnToCompactTask: Task<Void, Never>?
     /// True when the Kanban ambient mode should be displayed whenever the
     /// pipeline is idle. Controlled by `enableKanbanAmbient()` / `disable…`.
@@ -81,7 +80,6 @@ final class DynamicIslandController {
     // MARK: - Pipeline mode
 
     func show(state: IslandState) {
-        dismissTask?.cancel()
         returnToCompactTask?.cancel()
 
         switch state {
@@ -165,7 +163,6 @@ final class DynamicIslandController {
     }
 
     func dismiss() {
-        dismissTask?.cancel()
         returnToAmbientOrHide()
     }
 
@@ -323,6 +320,8 @@ struct NotchCompactLeading: View {
     @Bindable var viewModel: NotchViewModel
 
     var body: some View {
+        //TODO: design/create-animation (#117 https://github.com/Night-District/bar-ticket/issues/117)
+        // Add unique animation, replacing basic SF Symbol
         HStack(spacing: 5) {
             Image(systemName: "rectangle.3.group.fill")
                 .font(.system(size: 11, weight: .semibold))
@@ -346,6 +345,8 @@ struct NotchCompactLeading: View {
     }
 }
 
+//TODO: design/animate-circle (#116 https://github.com/Night-District/bar-ticket/issues/116)
+// Make circle.fill pulse
 struct NotchCompactTrailing: View {
     @Bindable var viewModel: NotchViewModel
 

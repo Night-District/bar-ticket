@@ -83,14 +83,18 @@ final class AppState {
         githubUser = nil
         needsProjectScope = false
         kanbanBoard = nil
+        kanbanFetchError = nil
         activeWatchedDirectory = nil
+        islandController?.viewModel.kanbanBoard = nil
+        islandController?.viewModel.kanbanFetchError = nil
+        islandController?.viewModel.kanbanProjectName = nil
         kanbanSync?.stop()
         islandController?.disableAmbient()
     }
 
     /// Verify that the current token has a Projects-capable scope. Updates
     /// `needsProjectScope` — true means the user should reauth to use Kanban.
-    func refreshProjectScopeCheck() async {
+    @MainActor func refreshProjectScopeCheck() async {
         guard let token = githubToken else {
             needsProjectScope = false
             return

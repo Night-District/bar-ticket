@@ -567,9 +567,14 @@ struct ProjectDropdownButton: View {
             let projects = try await GitHubProjectsClient.fetchProjects(owner: repoInfo, token: token)
 
             // Upsert into cache
-            let existingIds = Set(cachedProjects.map(\.projectNodeId))
+            let existingById = Dictionary(uniqueKeysWithValues: cachedProjects.map { ($0.projectNodeId, $0) })
             for project in projects {
-                if !existingIds.contains(project.projectNodeId) {
+                if let existing = existingById[project.projectNodeId] {
+                    existing.displayName = project.displayName
+                    existing.owner = project.owner
+                    existing.hasBoardLayout = project.hasBoardLayout
+                    existing.projectURL = project.projectURL
+                } else {
                     modelContext.insert(project)
                 }
             }

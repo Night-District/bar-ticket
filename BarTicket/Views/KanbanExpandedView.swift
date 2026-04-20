@@ -188,6 +188,7 @@ private struct CardView: View {
     let onCardCopied: ((KanbanCard) -> Void)?
 
     @State private var justCopied = false
+    @State private var resetTask: Task<Void, Never>?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -220,11 +221,11 @@ private struct CardView: View {
         NSPasteboard.general.setString(card.body, forType: .string)
         onCardCopied?(card)
         withAnimation(.easeOut(duration: 0.2)) { justCopied = true }
-        Task {
+        resetTask?.cancel()
+        resetTask = Task { @MainActor in
             try? await Task.sleep(for: .seconds(1.5))
-            await MainActor.run {
-                withAnimation(.easeOut(duration: 0.3)) { justCopied = false }
-            }
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeOut(duration: 0.3)) { justCopied = false }
         }
     }
 }
