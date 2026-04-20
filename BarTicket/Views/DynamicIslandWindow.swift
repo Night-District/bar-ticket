@@ -8,9 +8,21 @@ enum IconAnimation: Equatable {
     case pulsing
 }
 
+enum NotchMode: Equatable {
+    case kanban
+    case pipeline
+}
+
+/// Unified state container read by the compact + expanded notch views. Owns
+/// both the legacy "pipeline" fields (detecting → creating → confirmed) and
+/// the Kanban board snapshot.
 @MainActor
 @Observable
 final class NotchViewModel {
+    // Shared
+    var mode: NotchMode = .kanban
+
+    // Pipeline state
     var icon: String = "circle.fill"
     var iconColor: Color = .blue
     var iconAnimation: IconAnimation = .none
@@ -21,74 +33,98 @@ final class NotchViewModel {
     var projectURL: String?
     var projectFailed: Bool = false
     var isV2Project: Bool = false
+
+    // Kanban state
+    var kanbanBoard: KanbanBoard?
+    var kanbanProjectName: String?
+    var kanbanFetchError: String?
+    var kanbanOnCardCopied: ((KanbanCard) -> Void)?
+    var kanbanOnSelectProject: (() -> Void)?
+    var kanbanOnExpand: (() -> Void)?
+    var kanbanOnDismiss: (() -> Void)?
+    var kanbanOnRefresh: (() -> Void)?
+    var availableProjects: [(nodeId: String, name: String)] = []
+    var kanbanOnPickProject: ((String) -> Void)?
 }
 
 @MainActor
 final class DynamicIslandController {
-    private var notch: DynamicNotch<NotchExpandedView, EmptyView, EmptyView>?
-    private let viewModel = NotchViewModel()
-    private var dismissTask: Task<Void, Never>?
-    private var isVisible = false
-    
+    private var notch: DynamicNotch<NotchExpandedView, NotchCompactLeading, NotchCompactTrailing>?
+    let viewModel = NotchViewModel()
+    private var returnToCompactTask: Task<Void, Never>?
+    /// True when the Kanban ambient mode should be displayed whenever the
+    /// pipeline is idle. Controlled by `enableKanbanAmbient()` / `disable…`.
+    private var ambientEnabled = false
+
     //TODO: design/github-icons (#59 https://github.com/Night-District/bar-ticket/issues/59)
     // Download actual GitHub icon SVGs for projects, issues, branches, etc. and render them in the island instead of generic system icons.
+
+    // MARK: - Ambient Kanban mode
+
+    /// Called when Kanban should be displayed as the default/ambient notch state.
+    /// Idempotent — safe to call repeatedly when the board refreshes.
+    func enableKanbanAmbient() {
+        ambientEnabled = true
+        viewModel.mode = .kanban
+        presentIfNeeded()
+    }
+
+    /// Hide the notch entirely. Used when no project is selected and no pipeline is active.
+    func disableAmbient() {
+        ambientEnabled = false
+        if viewModel.mode == .kanban {
+            teardown()
+        }
+    }
+
+    // MARK: - Pipeline mode
+
     func show(state: IslandState) {
-        dismissTask?.cancel()
-        
+        returnToCompactTask?.cancel()
+
         switch state {
         case .hidden:
-            dismiss()
+            returnToAmbientOrHide()
             return
-        
+
         case .detecting(let title):
+            viewModel.mode = .pipeline
             viewModel.icon = "gear"
             viewModel.iconColor = .blue
             viewModel.iconAnimation = .rotating
             viewModel.title = "TODO detected"
             viewModel.subtitle = title
-            viewModel.issueURL = nil
-            viewModel.projectName = nil
-            viewModel.projectURL = nil
-            viewModel.projectFailed = false
-            viewModel.isV2Project = false
+            resetPipelineExtras()
 
         case .expanding(let title):
+            viewModel.mode = .pipeline
             viewModel.icon = "sparkles"
             viewModel.iconColor = .purple
             viewModel.iconAnimation = .pulsing
             viewModel.title = "Expanding with AI..."
             viewModel.subtitle = title
-            viewModel.issueURL = nil
-            viewModel.projectName = nil
-            viewModel.projectURL = nil
-            viewModel.projectFailed = false
-            viewModel.isV2Project = false
+            resetPipelineExtras()
 
         case .creating(let title):
+            viewModel.mode = .pipeline
             viewModel.icon = "arrow.trianglehead.2.counterclockwise"
             viewModel.iconColor = .orange
             viewModel.iconAnimation = .rotating
             viewModel.title = "Creating issue..."
             viewModel.subtitle = title
-            viewModel.issueURL = nil
-            viewModel.projectName = nil
-            viewModel.projectURL = nil
-            viewModel.projectFailed = false
-            viewModel.isV2Project = false
+            resetPipelineExtras()
 
         case .updating(let title):
+            viewModel.mode = .pipeline
             viewModel.icon = "arrow.trianglehead.clockwise"
             viewModel.iconColor = .cyan
             viewModel.iconAnimation = .rotating
             viewModel.title = "Updating issue..."
             viewModel.subtitle = title
-            viewModel.issueURL = nil
-            viewModel.projectName = nil
-            viewModel.projectURL = nil
-            viewModel.projectFailed = false
-            viewModel.isV2Project = false
+            resetPipelineExtras()
 
         case .confirmed(_, let repoFullName, let issueNumber, let issueURL, let projectName, let projectURL, let projectFailed, let isV2):
+            viewModel.mode = .pipeline
             viewModel.icon = "checkmark.circle.fill"
             viewModel.iconColor = .green
             viewModel.iconAnimation = .pulsing
@@ -101,62 +137,128 @@ final class DynamicIslandController {
             viewModel.isV2Project = isV2
 
         case .error(let message):
+            viewModel.mode = .pipeline
             viewModel.icon = "xmark.circle.fill"
             viewModel.iconColor = .red
             viewModel.iconAnimation = .none
             viewModel.title = "Failed"
             viewModel.subtitle = message
-            viewModel.issueURL = nil
-            viewModel.projectName = nil
-            viewModel.projectURL = nil
-            viewModel.projectFailed = false
-            viewModel.isV2Project = false
+            resetPipelineExtras()
         }
 
-        if !isVisible {
-            isVisible = true
-            let newNotch = DynamicNotch(hoverBehavior: [.hapticFeedback], style: .notch) {
-                NotchExpandedView(viewModel: self.viewModel)
-            }
-            notch = newNotch
-            Task { @MainActor in
-                if let screen = NSScreen.main {
-                    await newNotch.expand(on: screen)
-                }
-            }
+        presentIfNeeded()
+        Task { @MainActor [weak self] in
+            guard let self, let notch = self.notch, let screen = NSScreen.main else { return }
+            await notch.expand(on: screen)
         }
 
         switch state {
         case .confirmed:
-            scheduleDismiss(after: Constants.islandConfirmDuration)
+            scheduleReturnToAmbient(after: Constants.islandConfirmDuration)
         case .error:
-            scheduleDismiss(after: Constants.islandErrorDuration)
+            scheduleReturnToAmbient(after: Constants.islandErrorDuration)
         default:
             break
         }
     }
-    
+
     func dismiss() {
-        dismissTask?.cancel()
-        isVisible = false
+        returnToAmbientOrHide()
+    }
+
+    // MARK: - Private
+
+    private func resetPipelineExtras() {
+        viewModel.issueURL = nil
+        viewModel.projectName = nil
+        viewModel.projectURL = nil
+        viewModel.projectFailed = false
+        viewModel.isV2Project = false
+    }
+
+    /// Build the underlying DynamicNotch once. View content observes the shared
+    /// NotchViewModel so mode switches happen purely through state changes.
+    private func presentIfNeeded() {
+        guard notch == nil else { return }
+        let vm = viewModel
+        let notch = DynamicNotch(
+            hoverBehavior: [.hapticFeedback, .keepVisible],
+            style: .notch,
+            expanded: { NotchExpandedView(viewModel: vm) },
+            compactLeading: { NotchCompactLeading(viewModel: vm) },
+            compactTrailing: { NotchCompactTrailing(viewModel: vm) }
+        )
+        vm.kanbanOnExpand = { [weak self] in
+            guard let self else { return }
+            Task { @MainActor [weak self] in
+                guard let notch = self?.notch, let screen = NSScreen.main else { return }
+                await notch.expand(on: screen)
+            }
+        }
+        vm.kanbanOnDismiss = { [weak self] in
+            guard let self else { return }
+            self.returnToAmbientOrHide()
+        }
+        self.notch = notch
+
         Task { @MainActor in
-            await notch?.hide()
-            notch = nil
+            guard let screen = NSScreen.main else { return }
+            if vm.mode == .kanban {
+                await notch.compact(on: screen)
+            } else {
+                await notch.expand(on: screen)
+            }
         }
     }
 
-    private func scheduleDismiss(after delay: TimeInterval) {
-        dismissTask = Task { @MainActor in
+    private func scheduleReturnToAmbient(after delay: TimeInterval) {
+        returnToCompactTask?.cancel()
+        returnToCompactTask = Task { @MainActor [weak self] in
             try? await Task.sleep(for: .seconds(delay))
             guard !Task.isCancelled else { return }
-            isVisible = false
+            self?.returnToAmbientOrHide()
+        }
+    }
+
+    private func returnToAmbientOrHide() {
+        if ambientEnabled {
+            viewModel.mode = .kanban
+            Task { @MainActor [weak self] in
+                guard let notch = self?.notch, let screen = NSScreen.main else { return }
+                await notch.compact(on: screen)
+            }
+        } else {
+            teardown()
+        }
+    }
+
+    private func teardown() {
+        let notch = self.notch
+        self.notch = nil
+        Task { @MainActor in
             await notch?.hide()
-            notch = nil
         }
     }
 }
 
+// MARK: - Expanded view (branches on mode)
+
 struct NotchExpandedView: View {
+    @Bindable var viewModel: NotchViewModel
+
+    var body: some View {
+        Group {
+            switch viewModel.mode {
+            case .pipeline:
+                PipelineExpandedView(viewModel: viewModel)
+            case .kanban:
+                KanbanExpandedView(viewModel: viewModel)
+            }
+        }
+    }
+}
+
+private struct PipelineExpandedView: View {
     @Bindable var viewModel: NotchViewModel
 
     var body: some View {
@@ -188,7 +290,7 @@ struct NotchExpandedView: View {
                     )
                 }
             }
-            
+
             Spacer(minLength: 0)
 
             if let urlString = viewModel.issueURL,
@@ -212,7 +314,59 @@ struct NotchExpandedView: View {
     }
 }
 
-// MARK: - ProjectBadge
+// MARK: - Compact views
+
+struct NotchCompactLeading: View {
+    @Bindable var viewModel: NotchViewModel
+
+    var body: some View {
+        //TODO: design/create-animation (#117 https://github.com/Night-District/bar-ticket/issues/117)
+        // Add unique animation, replacing basic SF Symbol
+        HStack(spacing: 5) {
+            Image(systemName: "rectangle.3.group.fill")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Color(red: 0.55, green: 0.37, blue: 0.96))
+
+            if let name = viewModel.kanbanProjectName ?? viewModel.kanbanBoard?.projectTitle, !name.isEmpty {
+                Text(name)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.9))
+                    .lineLimit(1)
+                    .frame(maxWidth: 120)
+            } else {
+                Text("No project")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+        }
+        .padding(.horizontal, 6)
+        .contentShape(Rectangle())
+        .onTapGesture { viewModel.kanbanOnExpand?() }
+    }
+}
+
+//TODO: design/animate-circle (#116 https://github.com/Night-District/bar-ticket/issues/116)
+// Make circle.fill pulse
+struct NotchCompactTrailing: View {
+    @Bindable var viewModel: NotchViewModel
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "circle.fill")
+                .font(.system(size: 6))
+                .foregroundStyle(Color(red: 0.18, green: 0.75, blue: 0.47))
+            Text("\(viewModel.kanbanBoard?.totalOpenIssues ?? 0)")
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .monospacedDigit()
+        }
+        .padding(.horizontal, 6)
+        .contentShape(Rectangle())
+        .onTapGesture { viewModel.kanbanOnExpand?() }
+    }
+}
+
+// MARK: - ProjectBadge (unchanged)
 
 struct ProjectBadge: View {
     let name: String

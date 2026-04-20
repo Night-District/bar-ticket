@@ -7,12 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CC867DEFD0905CE78888D044 /* KanbanBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A1369C2752674EAA2DD1D7 /* KanbanBoard.swift */; };
+		58A0381D4F6B9DDF56AA16CF /* KanbanSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FFAFFBC0D292928398347C /* KanbanSyncService.swift */; };
+		1CFBC9CD18B309557FF6E0F7 /* GitHubScopeChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF8803BB57DFDB302D04C699 /* GitHubScopeChecker.swift */; };
+		3BC150C15E3BFCF56A4FDD34 /* KanbanExpandedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5744100149F30E8847BD33F /* KanbanExpandedView.swift */; };
 		059DA0807579DB4A87095C9B /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F451F7E719B10F1621256F0A /* AppSettings.swift */; };
 		A100BB00CC00DD00EE00FF01 /* IssueTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A110BB10CC10DD10EE10FF11 /* IssueTemplate.swift */; };
 		A200BB00CC00DD00EE00FF02 /* BuiltInTemplates.swift in Sources */ = {isa = PBXBuildFile; fileRef = A210BB10CC10DD10EE10FF22 /* BuiltInTemplates.swift */; };
 		A300BB00CC00DD00EE00FF03 /* ClaudeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A310BB10CC10DD10EE10FF33 /* ClaudeClient.swift */; };
 		A400BB00CC00DD00EE00FF04 /* IssueTemplateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A410BB10CC10DD10EE10FF44 /* IssueTemplateService.swift */; };
 		28E9A422848D3D302A0D03E7 /* FileWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E008ACE6FA2659DE4A51EBE /* FileWatcher.swift */; };
+		FA01BB02CC03DD04EE05FF07 /* ForegroundAppWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA11BB12CC13DD14EE15FF17 /* ForegroundAppWatcher.swift */; };
 		3F68F380495D45FA16C297DC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8AC6143CA7BF64B2BAF007 /* SettingsView.swift */; };
 		540CF3013DBBBBF326F1C9AC /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E90F4B01A5C198FE0307701 /* AppState.swift */; };
 		5C52FC8A2F68AE2B24A99488 /* BarTicketApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F507DC7CA0D9F143237B4B34 /* BarTicketApp.swift */; };
@@ -36,6 +41,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		53A1369C2752674EAA2DD1D7 /* KanbanBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanbanBoard.swift; sourceTree = "<group>"; };
+		29FFAFFBC0D292928398347C /* KanbanSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanbanSyncService.swift; sourceTree = "<group>"; };
+		DF8803BB57DFDB302D04C699 /* GitHubScopeChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubScopeChecker.swift; sourceTree = "<group>"; };
+		C5744100149F30E8847BD33F /* KanbanExpandedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanbanExpandedView.swift; sourceTree = "<group>"; };
 		1F29F001926B68BA31797C6F /* GitHubProjectsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubProjectsClient.swift; sourceTree = "<group>"; };
 		A110BB10CC10DD10EE10FF11 /* IssueTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IssueTemplate.swift; sourceTree = "<group>"; };
 		A210BB10CC10DD10EE10FF22 /* BuiltInTemplates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuiltInTemplates.swift; sourceTree = "<group>"; };
@@ -51,6 +60,7 @@
 		7CD0577A2F872E72009D7363 /* bar_ticket_icon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = bar_ticket_icon.icon; sourceTree = "<group>"; };
 		7F577904FD1BA62C74B9F423 /* BarTicket.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BarTicket.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E008ACE6FA2659DE4A51EBE /* FileWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWatcher.swift; sourceTree = "<group>"; };
+		FA11BB12CC13DD14EE15FF17 /* ForegroundAppWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForegroundAppWatcher.swift; sourceTree = "<group>"; };
 		AA11BB12CC13DD14EE15FF16 /* GitHubUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubUser.swift; sourceTree = "<group>"; };
 		B12C96699CD1DE993D65E76A /* ProjectCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectCache.swift; sourceTree = "<group>"; };
 		BA11CB12DC13ED14FE15AF16 /* GitHubAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubAuthService.swift; sourceTree = "<group>"; };
@@ -81,9 +91,12 @@
 		1DC8896ABBFC5D35DEB1FC91 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				29FFAFFBC0D292928398347C /* KanbanSyncService.swift */,
+				DF8803BB57DFDB302D04C699 /* GitHubScopeChecker.swift */,
 				BA11CB12DC13ED14FE15AF16 /* GitHubAuthService.swift */,
 				A310BB10CC10DD10EE10FF33 /* ClaudeClient.swift */,
 				8E008ACE6FA2659DE4A51EBE /* FileWatcher.swift */,
+				FA11BB12CC13DD14EE15FF17 /* ForegroundAppWatcher.swift */,
 				6E23A849A4DDD594F868BA63 /* GitHubClient.swift */,
 				1F29F001926B68BA31797C6F /* GitHubProjectsClient.swift */,
 				672C9A318AC41F205C94733E /* GitResolver.swift */,
@@ -105,6 +118,7 @@
 		54A0133A339749BB0A322606 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				53A1369C2752674EAA2DD1D7 /* KanbanBoard.swift */,
 				F451F7E719B10F1621256F0A /* AppSettings.swift */,
 				AA11BB12CC13DD14EE15FF16 /* GitHubUser.swift */,
 				A110BB10CC10DD10EE10FF11 /* IssueTemplate.swift */,
@@ -143,6 +157,7 @@
 		D180593C1C073C2BA59F3ED4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C5744100149F30E8847BD33F /* KanbanExpandedView.swift */,
 				F86C415F6801E38E222016DA /* DynamicIslandWindow.swift */,
 				CA11DB12EC13FD14AE15BF16 /* OnboardingView.swift */,
 				CF8AC6143CA7BF64B2BAF007 /* SettingsView.swift */,
@@ -240,6 +255,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC867DEFD0905CE78888D044 /* KanbanBoard.swift in Sources */,
+				58A0381D4F6B9DDF56AA16CF /* KanbanSyncService.swift in Sources */,
+				1CFBC9CD18B309557FF6E0F7 /* GitHubScopeChecker.swift in Sources */,
+				3BC150C15E3BFCF56A4FDD34 /* KanbanExpandedView.swift in Sources */,
 				059DA0807579DB4A87095C9B /* AppSettings.swift in Sources */,
 				540CF3013DBBBBF326F1C9AC /* AppState.swift in Sources */,
 				5C52FC8A2F68AE2B24A99488 /* BarTicketApp.swift in Sources */,
@@ -248,6 +267,7 @@
 				F610043466E0E1C7807AFD68 /* Constants.swift in Sources */,
 				F12E6D92B7591973EF6384F1 /* DynamicIslandWindow.swift in Sources */,
 				28E9A422848D3D302A0D03E7 /* FileWatcher.swift in Sources */,
+				FA01BB02CC03DD04EE05FF07 /* ForegroundAppWatcher.swift in Sources */,
 				BA01CB02DC03ED04FE05AF06 /* GitHubAuthService.swift in Sources */,
 				D28CDF2D71D68A356EEAF58C /* GitHubClient.swift in Sources */,
 				A1512A73640C9D588F6FA140 /* GitHubProjectsClient.swift in Sources */,
